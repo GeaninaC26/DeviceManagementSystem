@@ -1,0 +1,68 @@
+# Build results
+bin/
+obj/
+.vs/
+.vscode/
+*.dll
+*.exe
+*.pdb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+
+# Visual Studio cache
+.vs/
+.vs*
+
+# Test Results
+TestResults/
+*.trx
+*.coverage
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+.idea/
+
+# IDE
+.vscode/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Environment variables
+appsettings.Development.json
+.env
+.env.local
+
+# Rider
+.idea/
+*.sln.iml
+*.iml
+
+# Log files
+*.log
+
+# Temp files
+tmp/
+temp/
+
+# Database files (if using local SQLite or similar)
+*.db
+*.db-shm
+*.db-wal
