@@ -15,6 +15,14 @@ namespace DeviceManagementSystem.Domain.Entities
             DeviceId = deviceId;
         }
 
+        // Constructor for loading from database
+        public UserDevice(int id, int userId, int deviceId) : base(id)
+        {
+            ValidateInput(userId, deviceId);
+            UserId = userId;
+            DeviceId = deviceId;
+        }
+
         private void ValidateInput(int userId, int deviceId)
         {
             if (userId <= 0) throw new Exception("User ID is required");

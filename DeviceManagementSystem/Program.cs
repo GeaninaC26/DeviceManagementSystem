@@ -10,27 +10,19 @@ builder.Services.AddControllers();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-try
-{
-    using (var connection = new SqlConnection(connectionString))
-    {
-        connection.Open();
-        Console.WriteLine("✓ Database connection successful!");
-        connection.Close();
-    }
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"✗ Database connection failed: {ex.Message}");
-}
-
-if (app.Environment.IsDevelopment())
-{
-}
-
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 

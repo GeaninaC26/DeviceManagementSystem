@@ -18,6 +18,8 @@ namespace DeviceManagementSystem.Infrastructure
             );
 
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IDeviceRepository, DeviceRepository>();
+            services.AddScoped<IUserDeviceRepository, UserDeviceRepository>();
             
         }
 

@@ -123,13 +123,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             var userId = (int)reader["UserId"];
             var deviceId = (int)reader["DeviceId"];
 
-            var userDevice = new UserDevice(userId, deviceId);
-            
-            // Set Id th
-            // rough reflection since it's protected
-            typeof(UserDevice).BaseType?.GetProperty("Id")?.SetValue(userDevice, id);
-
-            return userDevice;
+            return new UserDevice(id, userId, deviceId);
         }
     }
 }

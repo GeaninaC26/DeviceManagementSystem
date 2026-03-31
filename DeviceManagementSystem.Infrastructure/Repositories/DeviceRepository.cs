@@ -119,12 +119,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             var ram = reader["RAM"].ToString();
             var description = reader["Description"].ToString();
 
-            var device = new Device(deviceName, manufacturer, deviceType, os, osVersion, processor, ram, description);
-
-            // Set Id through reflection since it's protected
-            typeof(Device).BaseType?.GetProperty("Id")?.SetValue(device, id);
-
-            return device;
+            return new Device(id, deviceName, manufacturer, deviceType, os, osVersion, processor, ram, description);
         }
     }
 }

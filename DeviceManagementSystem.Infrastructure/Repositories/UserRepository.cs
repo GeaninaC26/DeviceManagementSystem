@@ -22,15 +22,13 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, Name, Role, Location FROM Users WHERE Id = @Id";
+                command.CommandText = "SELECT Id, UserName, Role, UserLocation FROM Users WHERE Id = @Id";
                 command.Parameters.AddWithValue("@Id", id);
 
-                using (var reader = await command.ExecuteReaderAsync())
+                using var reader = await command.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
                 {
-                    if (await reader.ReadAsync())
-                    {
-                        return MapReaderToUser(reader);
-                    }
+                    return MapReaderToUser(reader);
                 }
             }
             return null;
@@ -43,7 +41,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, Name, Role, Location FROM Users";
+                command.CommandText = "SELECT Id, UserName, Role, UserLocation FROM Users";
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -62,10 +60,10 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "INSERT INTO Users (Name, Role, Location) VALUES (@Name, @Role, @Location)";
-                command.Parameters.AddWithValue("@Name", entity.Name);
+                command.CommandText = "INSERT INTO Users (UserName, Role, UserLocation) VALUES (@UserName, @Role, @UserLocation)";
+                command.Parameters.AddWithValue("@UserName", entity.UserName);
                 command.Parameters.AddWithValue("@Role", entity.Role.ToString());
-                command.Parameters.AddWithValue("@Location", entity.Location);
+                command.Parameters.AddWithValue("@UserLocation", entity.UserLocation);
 
                 await command.ExecuteNonQueryAsync();
             }
@@ -77,10 +75,10 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "UPDATE Users SET Name = @Name, Role = @Role, Location = @Location WHERE Id = @Id";
-                command.Parameters.AddWithValue("@Name", entity.Name);
+                command.CommandText = "UPDATE Users SET UserName = @UserName, Role = @Role, UserLocation = @UserLocation WHERE Id = @Id";
+                command.Parameters.AddWithValue("@UserName", entity.UserName);
                 command.Parameters.AddWithValue("@Role", entity.Role.ToString());
-                command.Parameters.AddWithValue("@Location", entity.Location);
+                command.Parameters.AddWithValue("@UserLocation", entity.UserLocation);
                 command.Parameters.AddWithValue("@Id", entity.Id);
                 
                 await command.ExecuteNonQueryAsync();
@@ -103,9 +101,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
         private User MapReaderToUser(SqlDataReader reader)
         {
             var id = (int)reader["Id"];
-            var name = reader["Name"].ToString();
+            var name = reader["UserName"].ToString();
             var roleString = reader["Role"].ToString();
-            var location = reader["Location"].ToString();
+            var location = reader["UserLocation"].ToString();
 
             // Parse Role enum safely
             if (!Enum.TryParse<RoleEnum>(roleString, out var role))
@@ -113,12 +111,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                 throw new InvalidOperationException($"Invalid role value: {roleString}");
             }
 
-            var user = new User(name, role, location);
-            
-            // Set Id through reflection since it's protected
-            typeof(User).BaseType?.GetProperty("Id")?.SetValue(user, id);
-
-            return user;
+            return new User(id, name, role, location);
         }
     }
 }
