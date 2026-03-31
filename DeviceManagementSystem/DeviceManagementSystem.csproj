@@ -9,8 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-preview.7.25380.108" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeviceManagementSystem.Infrastructure\DeviceManagementSystem.Infrastructure.csproj" />
+    <ProjectReference Include="..\DeviceManagementSystem.Application\DeviceManagementSystem.Application.csproj" />
   </ItemGroup>
 
 </Project>
