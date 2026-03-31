@@ -8,19 +8,29 @@ namespace DeviceManagementSystem.Application.Mappers
     {
         private readonly IUserRepository _userRepository;
         private readonly IDeviceRepository _deviceRepository;
-        public override Task<UserDeviceDto> PrepareItemAsync(UserDevice entity, CancellationToken token)
+
+        public UserDeviceMapper(IUserRepository userRepository, IDeviceRepository deviceRepository)
         {
-            if (entity == null) return Task.FromResult<UserDeviceDto>(null);
+            _userRepository = userRepository;
+            _deviceRepository = deviceRepository;
+        }
+
+        public override async Task<UserDeviceDto> PrepareItemAsync(UserDevice entity, CancellationToken token)
+        {
+            if (entity == null) return null;
+
+            var user = await _userRepository.GetByIdAsync(entity.UserId);
+            var device = await _deviceRepository.GetByIdAsync(entity.DeviceId);
+
             var userDeviceDto = new UserDeviceDto
             {
                 Id = entity.Id,
                 UserId = entity.UserId,
                 DeviceId = entity.DeviceId,
-                UserName =  _userRepository.GetByIdAsync(entity.UserId).Result.Name,
-                DeviceName =  _deviceRepository.GetByIdAsync(entity.DeviceId).Result.Name
+                UserName = user?.Name ?? $"User {entity.UserId}",
+                DeviceName = device?.Name ?? $"Device {entity.DeviceId}"
             };
-            return Task.FromResult(userDeviceDto);
+            return userDeviceDto;
         }
-
     }
 }

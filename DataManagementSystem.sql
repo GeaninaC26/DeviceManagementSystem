@@ -37,6 +37,7 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserDevices]') AND type in (N'U'))
 BEGIN
     CREATE TABLE UserDevices (
+        Id INT IDENTITY(1,1) ,
         UserId INT NOT NULL,
         DeviceId INT NOT NULL,
         PRIMARY KEY (UserId, DeviceId),
