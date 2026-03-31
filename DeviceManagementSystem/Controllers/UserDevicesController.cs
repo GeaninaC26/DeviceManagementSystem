@@ -1,0 +1,57 @@
+namespace DeviceManagementSystem.Controllers
+{
+    using DeviceManagementSystem.Application.Contracts;
+    using DeviceManagementSystem.Application.Features.UserDevices;
+    using DeviceManagementSystem.Application.Features.UserDevices.Commands;
+    using DeviceManagementSystem.Application.Features.Users;
+    using Microsoft.AspNetCore.Mvc;
+
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UserDevicesController : ControllerBase
+    {
+        private readonly UserDeviceService _userDeviceService;
+
+        public UserDevicesController(UserDeviceService userDeviceService)
+        {
+            _userDeviceService = userDeviceService;
+        }
+
+        [HttpGet]
+        public async Task<List<UserDeviceDto>> GetAllUserDevices(CancellationToken token)
+        {
+            return await _userDeviceService.GetAllAsync(token);
+        }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserDeviceDto>> GetUserDeviceById(int id, CancellationToken token)
+        {
+            var userDevice = await _userDeviceService.GetByIdAsync(id, token);
+            if (userDevice == null) return NotFound();
+            return Ok(userDevice);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AssignDeviceToUser([FromBody] AssignDeviceToUserCommand command)
+        {
+            await _userDeviceService.AssignDeviceToUserAsync(command.UserId, command.DeviceId);
+            return Ok();
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> UnassignDeviceFromUser(int id)
+        {
+            await _userDeviceService.UnassignDeviceFromUserAsync(id);
+            return Ok();
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<List<UserDeviceDto>>> GetUserDevicesByUserId(int userId, CancellationToken token)
+        {
+            // Validate User ID
+            if (userId <= 0)
+                throw new ArgumentException("User ID must be greater than 0", nameof(userId));
+
+            var userDevices = await _userDeviceService.GetByUserIdAsync(userId, token);
+            return Ok(userDevices);
+        }
+
+    }
+}

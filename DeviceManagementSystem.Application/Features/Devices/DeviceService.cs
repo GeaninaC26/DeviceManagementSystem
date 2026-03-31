@@ -18,7 +18,16 @@ namespace DeviceManagementSystem.Application.Features.Devices
 
         public async Task<DeviceDto> GetDeviceByIdAsync(int id, CancellationToken token)
         {
+            // Validate ID
+            if (id <= 0)
+                throw new ArgumentException("Device ID must be greater than 0", nameof(id));
+
             var device = await _deviceRepository.GetByIdAsync(id);
+            
+            // Check if device exists
+            if (device == null)
+                throw new Exception($"Device with ID {id} not found");
+            
             return await _deviceMapper.PrepareItemAsync(device, token);
         }
 
@@ -28,42 +37,59 @@ namespace DeviceManagementSystem.Application.Features.Devices
             return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
-        public async Task AddDeviceAsync(CreateDeviceCommand createDeviceCommand)
+        public async Task UpsertDeviceAsync(DeviceDto deviceDto)
         {
+            // Validate DTO
+            if (deviceDto == null)
+                throw new ArgumentNullException(nameof(deviceDto), "Device data cannot be null");
+
+            // Validate required fields
+            if (string.IsNullOrWhiteSpace(deviceDto.DeviceName))
+                throw new ArgumentException("Device name is required", nameof(deviceDto.DeviceName));
+
+            if (string.IsNullOrWhiteSpace(deviceDto.Manufacturer))
+                throw new ArgumentException("Manufacturer is required", nameof(deviceDto.Manufacturer));
+
+            if (string.IsNullOrWhiteSpace(deviceDto.DeviceType))
+                throw new ArgumentException("Device type is required", nameof(deviceDto.DeviceType));
+
+            if (string.IsNullOrWhiteSpace(deviceDto.OS))
+                throw new ArgumentException("Operating system is required", nameof(deviceDto.OS));
+
+            if (string.IsNullOrWhiteSpace(deviceDto.OSVersion))
+                throw new ArgumentException("OS version is required", nameof(deviceDto.OSVersion));
+
+            if (string.IsNullOrWhiteSpace(deviceDto.Processor))
+                throw new ArgumentException("Processor is required", nameof(deviceDto.Processor));
+
+            if (string.IsNullOrWhiteSpace(deviceDto.RAM))
+                throw new ArgumentException("RAM is required", nameof(deviceDto.RAM));
+
             var device = new Device(
-                createDeviceCommand.DeviceName,
-                createDeviceCommand.Manufacturer,
-                createDeviceCommand.DeviceType,
-                createDeviceCommand.OS,
-                createDeviceCommand.OSVersion,
-                createDeviceCommand.Processor,
-                createDeviceCommand.RAM,
-                createDeviceCommand.Description
+                deviceDto.DeviceName,
+                deviceDto.Manufacturer,
+                deviceDto.DeviceType,
+                deviceDto.OS,
+                deviceDto.OSVersion,
+                deviceDto.Processor,
+                deviceDto.RAM,
+                deviceDto.Description ?? string.Empty
             );
-            await _deviceRepository.AddAsync(device);
-        }
-
-        public async Task UpdateDeviceAsync(int id, UpdateDeviceCommand updateDeviceCommand)
-        {
-            var device = await _deviceRepository.GetByIdAsync(id);
-            if (device == null) throw new Exception("Device not found");
-
-            device.ChangeDeviceName(updateDeviceCommand.DeviceName);
-            device.ChangeManufacturer(updateDeviceCommand.Manufacturer);
-            device.ChangeDeviceType(updateDeviceCommand.DeviceType);
-            device.ChangeOS(updateDeviceCommand.OS);
-            device.ChangeOSVersion(updateDeviceCommand.OSVersion);
-            device.ChangeProcessor(updateDeviceCommand.Processor);
-            device.ChangeRAM(updateDeviceCommand.RAM);
-            device.ChangeDescription(updateDeviceCommand.Description);
-
-            await _deviceRepository.UpdateAsync(device);
+            await _deviceRepository.UpsertAsync(device);
         }
 
         public async Task DeleteDeviceAsync(int id)
         {
+            // Validate ID
+            if (id <= 0)
+                throw new ArgumentException("Device ID must be greater than 0", nameof(id));
+
             var device = await _deviceRepository.GetByIdAsync(id);
-            if (device == null) throw new Exception("Device not found");
+            
+            // Check if device exists
+            if (device == null)
+                throw new Exception($"Device with ID {id} not found");
+            
             await _deviceRepository.DeleteAsync(device.Id);
         }
 

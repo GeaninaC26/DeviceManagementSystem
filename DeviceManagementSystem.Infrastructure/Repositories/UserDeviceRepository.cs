@@ -75,30 +75,20 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return userDevices;
         }
 
-        public async Task AddAsync(UserDevice entity)
+        public async Task UpsertAsync(UserDevice entity)
         {
             using (var connection = _databaseProvider.GetConnection())
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "INSERT INTO UserDevices (UserId, DeviceId) VALUES (@UserId, @DeviceId)";
+                command.CommandText = @"
+                    IF NOT EXISTS (SELECT 1 FROM UserDevices WHERE DeviceId = @DeviceId)
+                    BEGIN
+                        INSERT INTO UserDevices (UserId, DeviceId)
+                        VALUES (@UserId, @DeviceId)
+                    END";
                 command.Parameters.AddWithValue("@UserId", entity.UserId);
                 command.Parameters.AddWithValue("@DeviceId", entity.DeviceId);
-
-                await command.ExecuteNonQueryAsync();
-            }
-        }
-
-        public async Task UpdateAsync(UserDevice entity)
-        {
-            using (var connection = _databaseProvider.GetConnection())
-            {
-                await connection.OpenAsync();
-                var command = connection.CreateCommand();
-                command.CommandText = "UPDATE UserDevices SET UserId = @UserId, DeviceId = @DeviceId WHERE Id = @Id";
-                command.Parameters.AddWithValue("@UserId", entity.UserId);
-                command.Parameters.AddWithValue("@DeviceId", entity.DeviceId);
-                command.Parameters.AddWithValue("@Id", entity.Id);
 
                 await command.ExecuteNonQueryAsync();
             }

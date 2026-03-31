@@ -2,6 +2,7 @@ namespace DeviceManagementSystem.Application.Features.Devices.Commands
 {
     public class CreateDeviceCommand 
     {
+        public int Id { get; set; }
         public string DeviceName { get; set; }
         public string Manufacturer { get; set; }
         public string DeviceType { get; set; }

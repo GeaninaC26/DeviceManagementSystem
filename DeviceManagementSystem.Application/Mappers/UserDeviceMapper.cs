@@ -16,8 +16,8 @@ namespace DeviceManagementSystem.Application.Mappers
                 Id = entity.Id,
                 UserId = entity.UserId,
                 DeviceId = entity.DeviceId,
-                UserName =  _userRepository.GetByIdAsync(entity.UserId).Result.UserName,
-                DeviceName =  _deviceRepository.GetByIdAsync(entity.DeviceId).Result.DeviceName
+                UserName =  _userRepository.GetByIdAsync(entity.UserId).Result.Name,
+                DeviceName =  _deviceRepository.GetByIdAsync(entity.DeviceId).Result.Name
             };
             return Task.FromResult(userDeviceDto);
         }

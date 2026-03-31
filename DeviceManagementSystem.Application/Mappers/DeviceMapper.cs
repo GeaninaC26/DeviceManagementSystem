@@ -11,9 +11,9 @@ namespace DeviceManagementSystem.Application.Mappers
             var device = new DeviceDto
             {
                 Id = entity.Id,
-                DeviceName = entity.DeviceName,
+                DeviceName = entity.Name,
                 Manufacturer = entity.Manufacturer,
-                DeviceType = entity.DeviceType,
+                DeviceType = entity.Type,
                 OS = entity.OS,
                 OSVersion = entity.OSVersion,
                 Processor = entity.Processor,

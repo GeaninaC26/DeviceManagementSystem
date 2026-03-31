@@ -13,9 +13,9 @@ namespace DeviceManagementSystem.Application.Mappers
             var dto = new UserDto
             {
                 Id = entity.Id,
-                UserName = entity.UserName,
-                Role = RoleEnum.GetName(entity.Role),
-                UserLocation = entity.UserLocation
+                UserName = entity.Name,
+                Role = entity.Role,
+                UserLocation = entity.Location
             };
             return Task.FromResult(dto);
         }

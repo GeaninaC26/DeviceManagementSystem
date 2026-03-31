@@ -5,9 +5,9 @@ namespace DeviceManagementSystem.Domain.Entities
 {
     public class Device : Entity<int>
     {
-        public string DeviceName { get; private set; }
+        public string Name { get; private set; }
         public string Manufacturer { get; private set; }
-        public string DeviceType { get; private set; }
+        public string Type { get; private set; }
         public string OS { get; private set; }
         public string OSVersion { get; private set; }
         public string Processor { get; private set; }
@@ -15,12 +15,12 @@ namespace DeviceManagementSystem.Domain.Entities
         public string Description { get; private set; }
 
         private Device() { }
-        public Device(string deviceName, string manufacturer, string deviceType, string os, string osVersion, string processor, string ram, string description)
+        public Device(string name, string manufacturer, string type, string os, string osVersion, string processor, string ram, string description)
         {
-            ValidateInput(deviceName, manufacturer, deviceType, os, osVersion, processor, ram, description);
-            DeviceName = deviceName;
+            ValidateInput(name, manufacturer, type, os, osVersion, processor, ram, description);
+            Name = name;
             Manufacturer = manufacturer;
-            DeviceType = deviceType;
+            Type = type;
             OS = os;
             OSVersion = osVersion;
             Processor = processor;
@@ -29,12 +29,12 @@ namespace DeviceManagementSystem.Domain.Entities
         }
 
         // Constructor for loading from database
-        public Device(int id, string deviceName, string manufacturer, string deviceType, string os, string osVersion, string processor, string ram, string description) : base(id)
+        public Device(int id, string name, string manufacturer, string type, string os, string osVersion, string processor, string ram, string description) : base(id)
         {
-            ValidateInput(deviceName, manufacturer, deviceType, os, osVersion, processor, ram, description);
-            DeviceName = deviceName;
+            ValidateInput(name, manufacturer, type, os, osVersion, processor, ram, description);
+            Name = name;
             Manufacturer = manufacturer;
-            DeviceType = deviceType;
+            Type = type;
             OS = os;
             OSVersion = osVersion;
             Processor = processor;
@@ -42,11 +42,11 @@ namespace DeviceManagementSystem.Domain.Entities
             Description = description;
         }
 
-        private void ValidateInput(string deviceName, string manufacturer, string deviceType, string os, string osVersion, string processor, string ram, string description)
+        private void ValidateInput(string name, string manufacturer, string type, string os, string osVersion, string processor, string ram, string description)
         {
-            if (string.IsNullOrWhiteSpace(deviceName)) throw new Exception("Device name is required");
+            if (string.IsNullOrWhiteSpace(name)) throw new Exception("Device name is required");
             if (string.IsNullOrWhiteSpace(manufacturer)) throw new Exception("Manufacturer is required");
-            if (string.IsNullOrWhiteSpace(deviceType)) throw new Exception("Device type is required");
+            if (string.IsNullOrWhiteSpace(type)) throw new Exception("Device type is required");
             if (string.IsNullOrWhiteSpace(os)) throw new Exception("Operating system is required");
             if (string.IsNullOrWhiteSpace(osVersion)) throw new Exception("OS version is required");
             if (string.IsNullOrWhiteSpace(processor)) throw new Exception("Processor is required");
@@ -57,9 +57,9 @@ namespace DeviceManagementSystem.Domain.Entities
 
         public void ChangeDeviceName(string newName)
         {
-            if (DeviceName == newName) return;
+            if (Name == newName) return;
             if (string.IsNullOrWhiteSpace(newName)) throw new Exception("Device name is required");
-            DeviceName = newName;
+            Name = newName;
         }
 
         public void ChangeManufacturer(string newManufacturer)
@@ -71,9 +71,9 @@ namespace DeviceManagementSystem.Domain.Entities
 
         public void ChangeDeviceType(string newDeviceType)
         {
-            if (DeviceType == newDeviceType) return;
+            if (Type == newDeviceType) return;
             if (string.IsNullOrWhiteSpace(newDeviceType)) throw new Exception("Device type is required");
-            DeviceType = newDeviceType;
+            Type = newDeviceType;
         }
 
         public void ChangeOS(string newOS)

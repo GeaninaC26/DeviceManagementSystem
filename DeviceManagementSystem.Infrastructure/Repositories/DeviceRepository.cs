@@ -19,7 +19,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, DeviceName, Manufacturer, DeviceType, OS, OSVersion, Processor, RAM, Description FROM Devices WHERE Id = @Id";
+                command.CommandText = "SELECT Id, Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description FROM Devices WHERE Id = @Id";
                 command.Parameters.AddWithValue("@Id", id);
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -40,7 +40,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, DeviceName, Manufacturer, DeviceType, OS, OSVersion, Processor, RAM, Description FROM Devices";
+                command.CommandText = "SELECT Id, Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description FROM Devices";
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -53,42 +53,41 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return devices;
         }
 
-        public async Task AddAsync(Device entity)
+        public async Task UpsertAsync(Device entity)
         {
             using (var connection = _databaseProvider.GetConnection())
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "INSERT INTO Devices (DeviceName, Manufacturer, DeviceType, OS, OSVersion, Processor, RAM, Description) VALUES (@DeviceName, @Manufacturer, @DeviceType, @OS, @OSVersion, @Processor, @RAM, @Description)";
-                command.Parameters.AddWithValue("@DeviceName", entity.DeviceName);
-                command.Parameters.AddWithValue("@Manufacturer", entity.Manufacturer);
-                command.Parameters.AddWithValue("@DeviceType", entity.DeviceType);
-                command.Parameters.AddWithValue("@OS", entity.OS);
-                command.Parameters.AddWithValue("@OSVersion", entity.OSVersion);
-                command.Parameters.AddWithValue("@Processor", entity.Processor);
-                command.Parameters.AddWithValue("@RAM", entity.RAM);
-                command.Parameters.AddWithValue("@Description", entity.Description);
+                command.CommandText = @"
+                    IF EXISTS (SELECT 1 FROM Devices WHERE Id = @Id)
+                    BEGIN
+                        UPDATE Devices
+                        SET Name = @Name,
+                            Manufacturer = @Manufacturer,
+                            Type = @Type,
+                            OS = @OS,
+                            OSVersion = @OSVersion,
+                            Processor = @Processor,
+                            RAM = @RAM,
+                            Description = @Description
+                        WHERE Id = @Id
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description)
+                        VALUES (@Name, @Manufacturer, @Type, @OS, @OSVersion, @Processor, @RAM, @Description)
+                    END";
 
-                await command.ExecuteNonQueryAsync();
-            }
-        }
-
-        public async Task UpdateAsync(Device entity)
-        {
-            using (var connection = _databaseProvider.GetConnection())
-            {
-                await connection.OpenAsync();
-                var command = connection.CreateCommand();
-                command.CommandText = "UPDATE Devices SET DeviceName = @DeviceName, Manufacturer = @Manufacturer, DeviceType = @DeviceType, OS = @OS, OSVersion = @OSVersion, Processor = @Processor, RAM = @RAM, Description = @Description WHERE Id = @Id";
-                command.Parameters.AddWithValue("@DeviceName", entity.DeviceName);
-                command.Parameters.AddWithValue("@Manufacturer", entity.Manufacturer);
-                command.Parameters.AddWithValue("@DeviceType", entity.DeviceType);
-                command.Parameters.AddWithValue("@OS", entity.OS);
-                command.Parameters.AddWithValue("@OSVersion", entity.OSVersion);
-                command.Parameters.AddWithValue("@Processor", entity.Processor);
-                command.Parameters.AddWithValue("@RAM", entity.RAM);
-                command.Parameters.AddWithValue("@Description", entity.Description);
                 command.Parameters.AddWithValue("@Id", entity.Id);
+                command.Parameters.AddWithValue("@Name", entity.Name);
+                command.Parameters.AddWithValue("@Manufacturer", entity.Manufacturer);
+                command.Parameters.AddWithValue("@Type", entity.Type);
+                command.Parameters.AddWithValue("@OS", entity.OS);
+                command.Parameters.AddWithValue("@OSVersion", entity.OSVersion);
+                command.Parameters.AddWithValue("@Processor", entity.Processor);
+                command.Parameters.AddWithValue("@RAM", entity.RAM);
+                command.Parameters.AddWithValue("@Description", entity.Description);
 
                 await command.ExecuteNonQueryAsync();
             }
@@ -110,9 +109,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
         private Device MapReaderToDevice(SqlDataReader reader)
         {
             var id = (int)reader["Id"];
-            var deviceName = reader["DeviceName"].ToString();
+            var deviceName = reader["Name"].ToString();
             var manufacturer = reader["Manufacturer"].ToString();
-            var deviceType = reader["DeviceType"].ToString();
+            var deviceType = reader["Type"].ToString();
             var os = reader["OS"].ToString();
             var osVersion = reader["OSVersion"].ToString();
             var processor = reader["Processor"].ToString();

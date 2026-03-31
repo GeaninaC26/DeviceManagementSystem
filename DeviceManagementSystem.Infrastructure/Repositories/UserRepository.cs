@@ -22,7 +22,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, UserName, Role, UserLocation FROM Users WHERE Id = @Id";
+                command.CommandText = "SELECT Id, Name, Role, Location FROM Users WHERE Id = @Id";
                 command.Parameters.AddWithValue("@Id", id);
 
                 using var reader = await command.ExecuteReaderAsync();
@@ -41,7 +41,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, UserName, Role, UserLocation FROM Users";
+                command.CommandText = "SELECT Id, Name, Role, Location FROM Users";
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -54,37 +54,32 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return users;
         }
 
-        public async Task AddAsync(User entity)
+        public async Task UpsertAsync(User entity)
         {
             using (var connection = _databaseProvider.GetConnection())
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "INSERT INTO Users (UserName, Role, UserLocation) VALUES (@UserName, @Role, @UserLocation)";
-                command.Parameters.AddWithValue("@UserName", entity.UserName);
-                command.Parameters.AddWithValue("@Role", entity.Role.ToString());
-                command.Parameters.AddWithValue("@UserLocation", entity.UserLocation);
-
-                await command.ExecuteNonQueryAsync();
-            }
-        }
-
-        public async Task UpdateAsync(User entity)
-        {
-            using (var connection = _databaseProvider.GetConnection())
-            {
-                await connection.OpenAsync();
-                var command = connection.CreateCommand();
-                command.CommandText = "UPDATE Users SET UserName = @UserName, Role = @Role, UserLocation = @UserLocation WHERE Id = @Id";
-                command.Parameters.AddWithValue("@UserName", entity.UserName);
-                command.Parameters.AddWithValue("@Role", entity.Role.ToString());
-                command.Parameters.AddWithValue("@UserLocation", entity.UserLocation);
+                command.CommandText = @"
+                    IF EXISTS (SELECT 1 FROM Users WHERE Id = @Id)
+                    BEGIN
+                        UPDATE Users
+                        SET Name = @Name, Role = @Role, Location = @Location
+                        WHERE Id = @Id
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT INTO Users (Name, Role, Location)
+                        VALUES (@Name, @Role, @Location)
+                    END";
                 command.Parameters.AddWithValue("@Id", entity.Id);
-                
+                command.Parameters.AddWithValue("@Name", entity.Name);
+                command.Parameters.AddWithValue("@Role", entity.Role.ToString());
+                command.Parameters.AddWithValue("@Location", entity.Location);
+
                 await command.ExecuteNonQueryAsync();
             }
         }
-
         public async Task DeleteAsync(int id)
         {
             using (var connection = _databaseProvider.GetConnection())
@@ -93,7 +88,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                 var command = connection.CreateCommand();
                 command.CommandText = "DELETE FROM Users WHERE Id = @Id";
                 command.Parameters.AddWithValue("@Id", id);
-                
+
                 await command.ExecuteNonQueryAsync();
             }
         }
@@ -101,9 +96,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
         private User MapReaderToUser(SqlDataReader reader)
         {
             var id = (int)reader["Id"];
-            var name = reader["UserName"].ToString();
+            var name = reader["Name"].ToString();
             var roleString = reader["Role"].ToString();
-            var location = reader["UserLocation"].ToString();
+            var location = reader["Location"].ToString();
 
             // Parse Role enum safely
             if (!Enum.TryParse<RoleEnum>(roleString, out var role))

@@ -18,8 +18,16 @@ namespace DeviceManagementSystem.Application.Features.Users
 
         public async Task<UserDto> GetUserByIdAsync(int id)
         {
+            // Validate ID
+            if (id <= 0)
+                throw new ArgumentException("User ID must be greater than 0", nameof(id));
+
             var user = await _userRepository.GetByIdAsync(id);
-            if (user == null) return null;
+            
+            // Check if user exists
+            if (user == null)
+                throw new Exception($"User with ID {id} not found");
+            
             return _userMapper.PrepareItemAsync(user, CancellationToken.None).Result;
         }
 
@@ -29,28 +37,38 @@ namespace DeviceManagementSystem.Application.Features.Users
             return _userMapper.PrepareItemsAsync(users, CancellationToken.None).Result.ToList();
         }
 
-        public async Task AddUserAsync(string userName, RoleEnum role, string location)
+        public async Task UpsertUserAsync(UserDto userDto)
         {
-            var user = new User(userName, role, location);
-            await _userRepository.AddAsync(user);
-        }
+            // Validate DTO
+            if (userDto == null)
+                throw new ArgumentNullException(nameof(userDto), "User data cannot be null");
 
-        public async Task UpdateUserAsync(int id, string newUserName, RoleEnum newRole, string newLocation)
-        {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null) throw new Exception("User not found");
+            // Validate required fields
+            if (string.IsNullOrWhiteSpace(userDto.UserName))
+                throw new ArgumentException("User name is required", nameof(userDto.UserName));
 
-            user.ChangeName(newUserName);
-            user.ChangeRole(newRole);
-            user.ChangeLocation(newLocation);
+            if (userDto.Role == null)
+                throw new ArgumentException("User role is required", nameof(userDto.Role));
 
-            await _userRepository.UpdateAsync(user);
+            if (string.IsNullOrWhiteSpace(userDto.UserLocation))
+                throw new ArgumentException("User location is required", nameof(userDto.UserLocation));
+
+            var user = new User(userDto.UserName, userDto.Role, userDto.UserLocation);
+            await _userRepository.UpsertAsync(user);
         }
 
         public async Task DeleteUserAsync(int id)
         {
+            // Validate ID
+            if (id <= 0)
+                throw new ArgumentException("User ID must be greater than 0", nameof(id));
+
             var user = await _userRepository.GetByIdAsync(id);
-            if (user == null) throw new Exception("User not found");
+            
+            // Check if user exists
+            if (user == null)
+                throw new Exception($"User with ID {id} not found");
+            
             await _userRepository.DeleteAsync(user.Id);
         }
 

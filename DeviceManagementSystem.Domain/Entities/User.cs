@@ -5,33 +5,32 @@ namespace DeviceManagementSystem.Domain.Entities
     public class User : Entity<int>
     {
         public const int MaxLength = 100;
-        public string UserName {get; private set;}
+        public string Name {get; private set;}
         public RoleEnum Role {get; private set;}
-        public string UserLocation {get; private set;}
+        public string Location {get; private set;}
 
         private User(){}
-        public User(string userName, RoleEnum role, string location)
+        public User(string name, RoleEnum role, string location)
         {
-            ValidateInput(userName, role, location);
-            UserName = userName;
+            ValidateInput(name, role, location);
+            Name = name;
             Role = role;
-            UserLocation = location;
+            Location = location;
         }
 
         // Constructor for loading from database
-        public User(int id, string userName, RoleEnum role, string location) : base(id)
+        public User(int id, string name, RoleEnum role, string location) : base(id)
         {
-            ValidateInput(userName, role, location);
-            UserName = userName ;
+            ValidateInput(name, role, location);
+            Name = name ;
             Role = role;
-            UserLocation = location;
+            Location = location;
         }
 
-        private void ValidateInput(string userName, RoleEnum role, string location)
+        private void ValidateInput(string name, RoleEnum role, string location)
         {
-            if(string.IsNullOrWhiteSpace(userName)) throw new Exception("User name is required");
-            if(userName.Length > MaxLength) throw new Exception($"User name cannot exceed {MaxLength} characters.");
-            if(role == default(RoleEnum)) throw new Exception("Role is required");
+            if(string.IsNullOrWhiteSpace(name)) throw new Exception("User name is required");
+            if(name.Length > MaxLength) throw new Exception($"User name cannot exceed {MaxLength} characters.");
             if(string.IsNullOrWhiteSpace(location)) throw new Exception("Location is required");
             if(location.Length > MaxLength) throw new Exception($"Location cannot exceed {MaxLength} characters.");
             if(role != RoleEnum.Admin && role != RoleEnum.User) throw new Exception("Role must be either 'Admin' or 'User'");
@@ -40,10 +39,10 @@ namespace DeviceManagementSystem.Domain.Entities
 
         public void ChangeName(string newName)
         {
-            if(UserName == newName) return;
+            if(Name == newName) return;
             if(string.IsNullOrWhiteSpace(newName)) throw new Exception("User name is required");
             if(newName.Length > MaxLength) throw new Exception($"User name cannot exceed {MaxLength} characters.");
-            UserName = newName;
+            Name = newName;
         }
 
         public void ChangeRole(RoleEnum newRole)
@@ -56,10 +55,10 @@ namespace DeviceManagementSystem.Domain.Entities
 
         public void ChangeLocation(string newLocation)
         {
-            if(UserLocation == newLocation) return;
+            if(Location == newLocation) return;
             if(string.IsNullOrWhiteSpace(newLocation)) throw new Exception("User location is required");
             if(newLocation.Length > MaxLength) throw new Exception($"User location cannot exceed {MaxLength} characters.");
-            UserLocation = newLocation;
+            Location = newLocation;
         }
     }
 }
