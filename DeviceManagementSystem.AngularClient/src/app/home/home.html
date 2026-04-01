@@ -8,21 +8,29 @@
       </div>
 
       <div *ngIf="isLoading()" class="loading"> Loading... </div>
-      <div *ngIf="error()"  class="error"> {{ error() }} </div>
+      <div *ngIf="error()" class="error"> {{ error() }} </div>
       <div class="device-list">
         <div *ngFor="let device of devices()" class="device-item" (click)="selectDevice(device)"
           [class.selected]="selectedDevice() && selectedDevice().id === device.id">
           <div class="device-name">
             {{ device.name }}
           </div>
-          <span class="device-badge" > Serial number:{{ device.id }}  | </span>
-          <span class="device-badge" > Manufacturer:{{ device.manufacturer }}  | </span>
-          <span class="device-badge" > RAM: {{ device.ram }}  | </span>
-          <span class="device-badge" > Processor: {{ device.processor }} </span>
+          <span class="device-badge"> Serial number: {{ device.id }} </span>
+          <span class="device-badge"> | </span>
+          <span class="device-badge"> Manufacturer: {{ device.manufacturer }} </span>
+          <span class="device-badge"> | </span>
+          <span class="device-badge"> RAM: {{ device.ram }} </span>
+          <span class="device-badge"> | </span>
+          <span class="device-badge"> Processor: {{ device.processor }} </span>
 
         </div>
       </div>
 
     </div>
+    <div class="device-panel">
+      <app-device-management [selectedDevice]="selectedDevice()" [user]="assignedUser()"
+        (cancelled)="clearSelection()"></app-device-management>
+    </div>
   </div>
+
 </div>

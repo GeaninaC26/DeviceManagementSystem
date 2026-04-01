@@ -1,0 +1,30 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.device-management-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+}
+
+.card-footer {
+  margin-top: auto;
+}
+
+
+.device-item {
+  background-color: var(--bg-secondary, #E8F1FA);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.device-item p {
+  margin: 0.2rem 0;
+}

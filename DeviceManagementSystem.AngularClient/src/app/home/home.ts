@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal, WritableSignal, computed } from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { UserDto } from '../../contracts/user.dto';
 import { CommonModule } from '@angular/common';
@@ -6,10 +6,11 @@ import { DeviceService } from '../../services/device.service';
 import { UserDeviceService } from '../../services/user-device.service';
 import { DeviceDto } from '../../contracts/device.dto';
 import { UserDeviceDto } from '../../contracts/user-device.dto';
+import { DeviceManagementComponent } from './components/device-management.component';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule],
+  imports: [CommonModule, DeviceManagementComponent],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
@@ -19,6 +20,17 @@ export class Home implements OnInit {
   userDevices: WritableSignal<UserDeviceDto[]> = signal([]);
   selectedDevice: WritableSignal<DeviceDto | null> = signal(null);
   selectedUser: WritableSignal<UserDto | null> = signal(null);
+  assignedUser = computed(() => {
+    const selected = this.selectedDevice();
+    if (!selected) return null;
+
+    // Find the user-device mapping
+    const userDevice = this.userDevices().find(ud => ud.deviceId === selected.id);
+    if (!userDevice) return null;
+
+    // Find the user details
+    return this.users().find(u => u.id === userDevice.userId) || null;
+  });
   deviceSearchText: WritableSignal<string> = signal('');
   isLoading: WritableSignal<boolean> = signal(false);
   error: WritableSignal<string | null> = signal(null);
@@ -57,4 +69,8 @@ export class Home implements OnInit {
   selectDevice(device: DeviceDto) : void {
     this.selectedDevice.set(device);
   }
+  clearSelection(): void {
+    this.selectedDevice.set(null);
+  }
+
 }
