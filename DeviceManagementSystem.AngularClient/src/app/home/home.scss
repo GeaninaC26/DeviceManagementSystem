@@ -1,6 +1,9 @@
 .device-management {
   --top-navbar-height: 6.5em;
-  padding: 20%;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
   display: flex;
   height: calc(100vh - var(--top-navbar-height));
   flex-direction: column;
@@ -45,4 +48,57 @@
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.device-item {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-white);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.device-item:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary-color);
+}
+
+.device-item.selected {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--bg-white);
+}
+
+.device-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.device-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--secondary-color);
+}
+
+
+.loading, .error {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: var(--error-color);
+  background-color: var(--bg-white);
+  border-radius: var(--radius-sm);
 }

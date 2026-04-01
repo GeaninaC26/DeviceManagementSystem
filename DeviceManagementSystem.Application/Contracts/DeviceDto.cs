@@ -4,7 +4,7 @@ namespace DeviceManagementSystem.Application.Contracts
     {
         public string Name { get; set; }
         public string Manufacturer { get; set; }
-        public string DeviceType { get; set; }
+        public string Type { get; set; }
         public string OS { get; set; }
         public string OSVersion { get; set; }
         public string Processor { get; set; }

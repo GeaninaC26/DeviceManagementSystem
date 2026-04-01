@@ -13,7 +13,7 @@ namespace DeviceManagementSystem.Application.Mappers
                 Id = entity.Id,
                 Name = entity.Name,
                 Manufacturer = entity.Manufacturer,
-                DeviceType = entity.Type,
+                Type = entity.Type,
                 OS = entity.OS,
                 OSVersion = entity.OSVersion,
                 Processor = entity.Processor,

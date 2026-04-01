@@ -20,7 +20,8 @@ export class Home implements OnInit {
   selectedDevice: WritableSignal<DeviceDto | null> = signal(null);
   selectedUser: WritableSignal<UserDto | null> = signal(null);
   deviceSearchText: WritableSignal<string> = signal('');
-  isLoading = false;
+  isLoading: WritableSignal<boolean> = signal(false);
+  error: WritableSignal<string | null> = signal(null);
   constructor(private userService: UserService,
               private deviceService: DeviceService,
               private userDeviceService: UserDeviceService) {
@@ -31,6 +32,9 @@ export class Home implements OnInit {
   }
   private async loadData() {
     try {
+      this.isLoading.set(true);
+      this.error.set(null);
+
       this.users.set(await this.userService.getUsers());
       this.devices.set(await this.deviceService.getDevices());
       this.userDevices.set(await this.userDeviceService.getUserDevices());
@@ -39,10 +43,18 @@ export class Home implements OnInit {
       console.log('User-Device Associations:', this.userDevices());
     } catch (error) {
       console.error('Error fetching users:', error);
+      this.error.set('Failed to fetch users.');
+    } finally {
+      this.isLoading.set(false);
     }
+
   }
 
   onDeviceSearchTextChange(text: string) {
     this.deviceSearchText.set(text);
+  }
+
+  selectDevice(device: DeviceDto) : void {
+    this.selectedDevice.set(device);
   }
 }

@@ -50,8 +50,8 @@ namespace DeviceManagementSystem.Application.Features.Devices
             if (string.IsNullOrWhiteSpace(deviceDto.Manufacturer))
                 throw new ArgumentException("Manufacturer is required", nameof(deviceDto.Manufacturer));
 
-            if (string.IsNullOrWhiteSpace(deviceDto.DeviceType))
-                throw new ArgumentException("Device type is required", nameof(deviceDto.DeviceType));
+            if (string.IsNullOrWhiteSpace(deviceDto.Type))
+                throw new ArgumentException("Device type is required", nameof(deviceDto.Type));
 
             if (string.IsNullOrWhiteSpace(deviceDto.OS))
                 throw new ArgumentException("Operating system is required", nameof(deviceDto.OS));
@@ -68,7 +68,7 @@ namespace DeviceManagementSystem.Application.Features.Devices
             var device = new Device(
                 deviceDto.Name,
                 deviceDto.Manufacturer,
-                deviceDto.DeviceType,
+                deviceDto.Type,
                 deviceDto.OS,
                 deviceDto.OSVersion,
                 deviceDto.Processor,
