@@ -109,7 +109,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
         private Device MapReaderToDevice(SqlDataReader reader)
         {
             var id = (int)reader["Id"];
-            var deviceName = reader["Name"].ToString();
+            var name = reader["Name"].ToString();
             var manufacturer = reader["Manufacturer"].ToString();
             var deviceType = reader["Type"].ToString();
             var os = reader["OS"].ToString();
@@ -118,7 +118,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             var ram = reader["RAM"].ToString();
             var description = reader["Description"].ToString();
 
-            return new Device(id, deviceName, manufacturer, deviceType, os, osVersion, processor, ram, description);
+            return new Device(id, name, manufacturer, deviceType, os, osVersion, processor, ram, description);
         }
     }
 }

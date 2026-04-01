@@ -28,13 +28,13 @@ namespace DeviceManagementSystem.Application.Features.Users
             if (user == null)
                 throw new Exception($"User with ID {id} not found");
             
-            return _userMapper.PrepareItemAsync(user, CancellationToken.None).Result;
+            return await _userMapper.PrepareItemAsync(user, CancellationToken.None);
         }
 
         public async Task<List<UserDto>> GetAllUsersAsync()
         {
             var users = await _userRepository.GetAllAsync();
-            return _userMapper.PrepareItemsAsync(users, CancellationToken.None).Result.ToList();
+            return (await _userMapper.PrepareItemsAsync(users, CancellationToken.None)).ToList();
         }
 
         public async Task UpsertUserAsync(UserDto userDto)
@@ -44,16 +44,16 @@ namespace DeviceManagementSystem.Application.Features.Users
                 throw new ArgumentNullException(nameof(userDto), "User data cannot be null");
 
             // Validate required fields
-            if (string.IsNullOrWhiteSpace(userDto.UserName))
-                throw new ArgumentException("User name is required", nameof(userDto.UserName));
+            if (string.IsNullOrWhiteSpace(userDto.Name))
+                throw new ArgumentException("User name is required", nameof(userDto.Name));
 
             if (userDto.Role == null)
                 throw new ArgumentException("User role is required", nameof(userDto.Role));
 
-            if (string.IsNullOrWhiteSpace(userDto.UserLocation))
-                throw new ArgumentException("User location is required", nameof(userDto.UserLocation));
+            if (string.IsNullOrWhiteSpace(userDto.Location))
+                throw new ArgumentException("User location is required", nameof(userDto.Location));
 
-            var user = new User(userDto.UserName, userDto.Role, userDto.UserLocation);
+            var user = new User(userDto.Name, userDto.Role, userDto.Location);
             await _userRepository.UpsertAsync(user);
         }
 

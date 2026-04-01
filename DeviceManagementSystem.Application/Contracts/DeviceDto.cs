@@ -2,7 +2,7 @@ namespace DeviceManagementSystem.Application.Contracts
 {
     public class DeviceDto : Dto<int>
     {
-        public string DeviceName { get; set; }
+        public string Name { get; set; }
         public string Manufacturer { get; set; }
         public string DeviceType { get; set; }
         public string OS { get; set; }

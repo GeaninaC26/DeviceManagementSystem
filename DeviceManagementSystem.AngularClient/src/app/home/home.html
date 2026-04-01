@@ -1,0 +1,13 @@
+<div class="device-management">
+  <div class="device-management-layout">
+    <div class="device-list-panel">
+      <div class="device-search">
+        <input type="text" class="device-search-input" [value]="deviceSearchText()"
+          (input)="onDeviceSearchTextChange($event.target.value)" placeholder="Type to search for device.."
+          aria-label="Type to search for device.." />
+      </div>
+
+
+    </div>
+  </div>
+</div>

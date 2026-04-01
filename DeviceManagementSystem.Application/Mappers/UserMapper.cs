@@ -13,12 +13,13 @@ namespace DeviceManagementSystem.Application.Mappers
             var dto = new UserDto
             {
                 Id = entity.Id,
-                UserName = entity.Name,
+                Name = entity.Name,
                 Role = entity.Role,
-                UserLocation = entity.Location
+                Location = entity.Location
             };
             return Task.FromResult(dto);
         }
+
 
 
     }

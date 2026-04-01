@@ -44,8 +44,8 @@ namespace DeviceManagementSystem.Application.Features.Devices
                 throw new ArgumentNullException(nameof(deviceDto), "Device data cannot be null");
 
             // Validate required fields
-            if (string.IsNullOrWhiteSpace(deviceDto.DeviceName))
-                throw new ArgumentException("Device name is required", nameof(deviceDto.DeviceName));
+            if (string.IsNullOrWhiteSpace(deviceDto.Name))
+                throw new ArgumentException("Device name is required", nameof(deviceDto.Name));
 
             if (string.IsNullOrWhiteSpace(deviceDto.Manufacturer))
                 throw new ArgumentException("Manufacturer is required", nameof(deviceDto.Manufacturer));
@@ -66,7 +66,7 @@ namespace DeviceManagementSystem.Application.Features.Devices
                 throw new ArgumentException("RAM is required", nameof(deviceDto.RAM));
 
             var device = new Device(
-                deviceDto.DeviceName,
+                deviceDto.Name,
                 deviceDto.Manufacturer,
                 deviceDto.DeviceType,
                 deviceDto.OS,
