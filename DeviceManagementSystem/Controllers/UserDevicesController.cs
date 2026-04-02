@@ -38,6 +38,7 @@ namespace DeviceManagementSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> UnassignDeviceFromUser(int id)
         {
+            Console.WriteLine($"Received request to unassign user-device association with ID: {id}");
             await _userDeviceService.UnassignDeviceFromUserAsync(id);
             return Ok();
         }

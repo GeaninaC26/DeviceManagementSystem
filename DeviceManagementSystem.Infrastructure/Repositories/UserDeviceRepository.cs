@@ -31,7 +31,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                     }
                 }
             }
-            return null;
+            throw new Exception($"User-Device association with ID {id} not found");
         }
 
         public async Task<IEnumerable<UserDevice>> GetAllAsync()

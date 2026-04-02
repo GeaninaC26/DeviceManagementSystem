@@ -141,6 +141,11 @@ body {
   border: 1px solid var(--border-color);
 }
 
+.btn-add {
+  background-color: var(--success);
+  color: var(--bg-white);
+}
+
 .btn-secondary:hover {
   background-color: var(--bg-white);
 }

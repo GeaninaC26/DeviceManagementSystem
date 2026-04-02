@@ -37,44 +37,64 @@ namespace DeviceManagementSystem.Application.Features.Devices
             return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
-        public async Task UpsertDeviceAsync(DeviceDto deviceDto)
+        public async Task UpsertDeviceAsync(UpsertDeviceCommand command)
         {
-            // Validate DTO
-            if (deviceDto == null)
-                throw new ArgumentNullException(nameof(deviceDto), "Device data cannot be null");
+            // Validate command
+            if (command == null)
+                throw new ArgumentNullException(nameof(command), "Device data cannot be null");
 
             // Validate required fields
-            if (string.IsNullOrWhiteSpace(deviceDto.Name))
-                throw new ArgumentException("Device name is required", nameof(deviceDto.Name));
+            if (string.IsNullOrWhiteSpace(command.Name))
+                throw new ArgumentException("Device name is required", nameof(command.Name));
 
-            if (string.IsNullOrWhiteSpace(deviceDto.Manufacturer))
-                throw new ArgumentException("Manufacturer is required", nameof(deviceDto.Manufacturer));
+            if (string.IsNullOrWhiteSpace(command.Manufacturer))
+                throw new ArgumentException("Manufacturer is required", nameof(command.Manufacturer));
 
-            if (string.IsNullOrWhiteSpace(deviceDto.Type))
-                throw new ArgumentException("Device type is required", nameof(deviceDto.Type));
+            if (string.IsNullOrWhiteSpace(command.Type))
+                throw new ArgumentException("Device type is required", nameof(command.Type));
 
-            if (string.IsNullOrWhiteSpace(deviceDto.OS))
-                throw new ArgumentException("Operating system is required", nameof(deviceDto.OS));
+            if (string.IsNullOrWhiteSpace(command.OS))
+                throw new ArgumentException("Operating system is required", nameof(command.OS));
 
-            if (string.IsNullOrWhiteSpace(deviceDto.OSVersion))
-                throw new ArgumentException("OS version is required", nameof(deviceDto.OSVersion));
+            if (string.IsNullOrWhiteSpace(command.OSVersion))
+                throw new ArgumentException("OS version is required", nameof(command.OSVersion));
 
-            if (string.IsNullOrWhiteSpace(deviceDto.Processor))
-                throw new ArgumentException("Processor is required", nameof(deviceDto.Processor));
+            if (string.IsNullOrWhiteSpace(command.Processor))
+                throw new ArgumentException("Processor is required", nameof(command.Processor));
 
-            if (string.IsNullOrWhiteSpace(deviceDto.RAM))
-                throw new ArgumentException("RAM is required", nameof(deviceDto.RAM));
+            if (string.IsNullOrWhiteSpace(command.RAM))
+                throw new ArgumentException("RAM is required", nameof(command.RAM));
 
-            var device = new Device(
-                deviceDto.Name,
-                deviceDto.Manufacturer,
-                deviceDto.Type,
-                deviceDto.OS,
-                deviceDto.OSVersion,
-                deviceDto.Processor,
-                deviceDto.RAM,
-                deviceDto.Description ?? string.Empty
-            );
+            Device device;
+            if (command.Id > 0)
+            {
+                // Update existing device
+                device = new Device(
+                    command.Id,
+                    command.Name,
+                    command.Manufacturer,
+                    command.Type,
+                    command.OS,
+                    command.OSVersion,
+                    command.Processor,
+                    command.RAM,
+                    command.Description ?? string.Empty
+                );
+            }
+            else
+            {
+                // Create new device
+                device = new Device(
+                    command.Name,
+                    command.Manufacturer,
+                    command.Type,
+                    command.OS,
+                    command.OSVersion,
+                    command.Processor,
+                    command.RAM,
+                    command.Description ?? string.Empty
+                );
+            }
             await _deviceRepository.UpsertAsync(device);
         }
 

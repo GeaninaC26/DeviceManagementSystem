@@ -19,11 +19,13 @@ export class UserDeviceService {
     return this.http.get(`${this.url}/${id}`);
   }
 
-  async upsertUserDevice(userDevice: any): Promise<UserDeviceDto> {
+  async assignDeviceToUser(userDevice: any): Promise<UserDeviceDto> {
     return this.http.post(this.url, userDevice);
   }
 
   async deleteUserDevice(id: number): Promise<void> {
-    this.http.delete(`${this.url}/${id}`);
+    console.log(`Deleting user-device association with ID: ${id}`);
+    await this.http.delete(`${this.url}/${id}`);
+    console.log(`Delete request sent for user-device association with ID: ${id}`);
   }
 }

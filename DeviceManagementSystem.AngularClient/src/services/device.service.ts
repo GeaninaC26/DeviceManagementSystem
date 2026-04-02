@@ -24,7 +24,7 @@ export class DeviceService {
   }
 
   async deleteDevice(id: number): Promise<void> {
-    this.http.delete(`${this.url}/${id}`);
+    await this.http.delete(`${this.url}/${id}`);
   }
 
 }

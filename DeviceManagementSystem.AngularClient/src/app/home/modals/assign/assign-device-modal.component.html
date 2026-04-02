@@ -1,0 +1,55 @@
+<div class="modal-backdrop" (click)="onOutsideClick()">
+  <div class="modal-container" [ngClass]="size() || ''">
+    <div class="modal-dialog" style="width: 100%; border: none; box-shadow: none;" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" style="font-weight: bold; font-size: 1.25rem;">Assign Device to User</div>
+          <button *ngIf="showCloseButton()" type="button" class="close-button" style="border: none; background: transparent; font-size: 1.5rem; cursor: pointer;" (click)="close()">&times;</button>
+        </div>
+
+        <div class="modal-body" style="padding: 1rem;">
+          <div *ngIf="isLoading()" class="loading-state">
+            <p>Loading users...</p>
+          </div>
+
+          <div *ngIf="error()" class="error-state" style="margin-bottom: 0.75rem;">
+            <p class="text-danger" style="margin: 0;">{{ error() }}</p>
+          </div>
+
+          <div *ngIf="!isLoading() && !error()" class="users-section">
+            <h4 style="margin-bottom: 0.75rem;">Select a User</h4>
+            <table class="table table-hover table-bordered" style="margin-bottom: 0.75rem;">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Location</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let user of users()"
+                  [style.backgroundColor]="selectedUserId() === user.id ? 'rgba(59, 130, 246, 0.15)' : ''"
+                  [style.fontWeight]="selectedUserId() === user.id ? '600' : '400'"
+                  (click)="selectUser(user.id)"
+                  style="cursor: pointer;"
+                >
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.location }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div *ngIf="users().length === 0" class="no-users">
+              <p class="text-secondary" style="margin: 0;">No users available</p>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+            <button class="btn btn-secondary" (click)="cancelAssign()" [disabled]="isLoading()">Cancel</button>
+            <button class="btn btn-primary" (click)="confirmAssign()" [disabled]="!selectedUserId() || isLoading()">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

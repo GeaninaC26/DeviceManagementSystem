@@ -1,0 +1,143 @@
+<div class="modal-backdrop" (click)="onOutsideClick()">
+  <div class="modal-container" [ngClass]="size() || ''">
+    <div
+      class="modal-dialog"
+      style="width: 100%; border: none; box-shadow: none; "
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" style="font-weight: bold; font-size: 1.25rem">
+            Create a new device.
+          </div>
+          <button
+            *ngIf="showCloseButton()"
+            type="button"
+            class="close-button"
+            style="border: none; background: transparent; font-size: 1.5rem; cursor: pointer"
+            (click)="close()"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-body" style="padding: 1rem; overflow-y: scroll; max-height: calc(100vh - 200px);">
+          <div *ngIf="error()" class="error-state" style="margin-bottom: 0.75rem">
+            <p class="text-danger" style="margin: 0">{{ error() }}</p>
+          </div>
+
+          <form
+            (submit)="onSubmit($event)"
+            style="
+              font-family: var(--font-secondary);
+              padding: 1rem;
+              max-width: 100%;
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 1rem;
+            "
+          >
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label> Device Name: </label>
+              <input class="form-control" type="text" [formField]="createForm.name" />
+              @if (createForm.name().touched() && createForm.name().invalid()) {
+                <ul class="error-list">
+                  @for (error of createForm.name().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label> Manufacturer: </label>
+              <input class="form-control" type="text" [formField]="createForm.manufacturer" />
+              @if (createForm.manufacturer().touched() && createForm.manufacturer().invalid()) {
+                <ul class="error-list">
+                  @for (error of createForm.manufacturer().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label> Type: </label>
+              <input class="form-control" type="text" [formField]="createForm.type" />
+
+              @if (createForm.type().touched() && createForm.type().invalid()) {
+                <ul class="error-list">
+                  @for (error of createForm.type().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label> Operating System: </label>
+              <input class="form-control" type="text" [formField]="createForm.os" />
+
+              @if (createForm.os().touched() && createForm.os().invalid()) {
+                <ul class="error-list">
+                  @for (error of createForm.os().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label> OS Version: </label>
+              <input class="form-control" type="text" [formField]="createForm.osVersion" />
+
+              @if (createForm.osVersion().touched() && createForm.osVersion().invalid()) {
+                <ul class="error-list">
+                  @for (error of createForm.osVersion().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label> Processor: </label>
+              <input class="form-control" type="text" [formField]="createForm.processor" />
+
+              @if (createForm.processor().touched() && createForm.processor().invalid()) {
+                <ul class="error-list">
+                  @for (error of createForm.processor().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label> RAM: </label>
+              <input class="form-control" type="text" [formField]="createForm.ram" />
+
+              @if (createForm.ram().touched() && createForm.ram().invalid()) {
+                <ul class="error-list">
+                  @for (error of createForm.ram().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label> Description: </label>
+              <input class="form-control" type="text" [formField]="createForm.description" />
+              @if (createForm.description().touched() && createForm.description().invalid()) {
+                <ul class="error-list">
+                  @for (error of createForm.description().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+          </form>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem">
+            <button class="btn btn-secondary" (click)="cancelCreate()">Cancel</button>
+            <button class="btn btn-primary" type="submit" (click)="onSubmit($event)">Create Device</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

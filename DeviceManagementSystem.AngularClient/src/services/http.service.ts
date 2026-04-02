@@ -21,10 +21,10 @@ export class HttpService {
   }
 
   put<T>(path: string, body: any) {
-    return this.http.put<T>(path, body);
+    return firstValueFrom(this.http.put<T>(path, body));
   }
 
   delete<T>(path: string) {
-    return this.http.delete<T>(path);
+    return firstValueFrom(this.http.delete<T>(path));
   }
 }

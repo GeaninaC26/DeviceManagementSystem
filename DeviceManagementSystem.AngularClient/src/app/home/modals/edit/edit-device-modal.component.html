@@ -1,0 +1,138 @@
+<div class="modal-backdrop" (click)="onOutsideClick()">
+  <div class="modal-container" [ngClass]="size() || ''">
+    <div
+      class="modal-dialog"
+      style="width: 100%; border: none; box-shadow: none"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" style="font-weight: bold; font-size: 1.25rem">
+            Edit device
+          </div>
+          <button
+            *ngIf="showCloseButton()"
+            type="button"
+            class="close-button"
+            style="border: none; background: transparent; font-size: 1.5rem; cursor: pointer"
+            (click)="close()"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-body" style="padding: 1rem; overflow-y: scroll; max-height: calc(100vh - 200px)">
+          <div *ngIf="error()" class="error-state" style="margin-bottom: 0.75rem">
+            <p class="text-danger" style="margin: 0">{{ error() }}</p>
+          </div>
+
+          <form
+            (submit)="onSubmit($event)"
+            style="
+              font-family: var(--font-secondary);
+              padding: 1rem;
+              max-width: 100%;
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 1rem;
+            "
+          >
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label>Device Name:</label>
+              <input class="form-control" type="text" [formField]="editForm.name" />
+              @if (editForm.name().touched() && editForm.name().invalid()) {
+                <ul class="error-list">
+                  @for (error of editForm.name().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label>Manufacturer:</label>
+              <input class="form-control" type="text" [formField]="editForm.manufacturer" />
+              @if (editForm.manufacturer().touched() && editForm.manufacturer().invalid()) {
+                <ul class="error-list">
+                  @for (error of editForm.manufacturer().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label>Type:</label>
+              <input class="form-control" type="text" [formField]="editForm.type" />
+              @if (editForm.type().touched() && editForm.type().invalid()) {
+                <ul class="error-list">
+                  @for (error of editForm.type().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label>Operating System:</label>
+              <input class="form-control" type="text" [formField]="editForm.os" />
+              @if (editForm.os().touched() && editForm.os().invalid()) {
+                <ul class="error-list">
+                  @for (error of editForm.os().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label>OS Version:</label>
+              <input class="form-control" type="text" [formField]="editForm.osVersion" />
+              @if (editForm.osVersion().touched() && editForm.osVersion().invalid()) {
+                <ul class="error-list">
+                  @for (error of editForm.osVersion().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label>Processor:</label>
+              <input class="form-control" type="text" [formField]="editForm.processor" />
+              @if (editForm.processor().touched() && editForm.processor().invalid()) {
+                <ul class="error-list">
+                  @for (error of editForm.processor().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label>RAM:</label>
+              <input class="form-control" type="text" [formField]="editForm.ram" />
+              @if (editForm.ram().touched() && editForm.ram().invalid()) {
+                <ul class="error-list">
+                  @for (error of editForm.ram().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem; grid-column: 1 / -1">
+              <label>Description:</label>
+              <input class="form-control" type="text" [formField]="editForm.description" />
+              @if (editForm.description().touched() && editForm.description().invalid()) {
+                <ul class="error-list">
+                  @for (error of editForm.description().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+          </form>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; padding: 0 1rem">
+            <button class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+            <button class="btn btn-primary" type="submit" (click)="onSubmit($event)">Update Device</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -23,7 +23,7 @@ export class UserService {
   }
 
   async deleteUser(id: number): Promise<void> {
-    this.http.delete(`${this.url}/${id}`);
+    await this.http.delete(`${this.url}/${id}`);
   }
 
 }

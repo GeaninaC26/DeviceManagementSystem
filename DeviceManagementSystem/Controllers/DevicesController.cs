@@ -2,6 +2,7 @@ namespace DeviceManagementSystem.Controllers
 {
     using DeviceManagementSystem.Application.Contracts;
     using DeviceManagementSystem.Application.Features.Devices;
+    using DeviceManagementSystem.Application.Features.Devices.Commands;
     using DeviceManagementSystem.Application.Features.UserDevices.Commands;
     using Microsoft.AspNetCore.Mvc;
 
@@ -35,9 +36,9 @@ namespace DeviceManagementSystem.Controllers
             return Ok();
         }
         [HttpPost]
-        public async Task<IActionResult> UpsertDevice([FromBody] DeviceDto deviceDto)
+        public async Task<IActionResult> UpsertDevice([FromBody] UpsertDeviceCommand command)
         {
-            await _deviceService.UpsertDeviceAsync(deviceDto);
+            await _deviceService.UpsertDeviceAsync(command);
             return Ok();
         }
         

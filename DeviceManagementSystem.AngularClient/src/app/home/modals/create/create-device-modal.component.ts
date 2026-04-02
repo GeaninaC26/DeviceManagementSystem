@@ -1,0 +1,84 @@
+import { Component, OnInit, computed, input, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ModalComponent } from '../../../components/modal/modal.component';
+import { DeviceDto } from '../../../../contracts/device.dto';
+import { UserDto } from '../../../../contracts/user.dto';
+import { UserService } from '../../../../services/user.service';
+import { UserDeviceService } from '../../../../services/user-device.service';
+import { ModalOpts } from '../../../components/modal/modal-opts';
+import { DeviceService } from '../../../../services/device.service';
+import { form, FormField, required, submit } from '@angular/forms/signals';
+
+interface CreateDeviceModel {
+  name: string;
+  manufacturer: string;
+  type: string;
+  os: string;
+  osVersion: string;
+  processor: string;
+  ram: string;
+  description: string;
+}
+
+@Component({
+  selector: 'app-create-device-modal',
+  standalone: true,
+  imports: [CommonModule, FormField],
+  templateUrl: './create-device-modal.component.html',
+  styleUrls: ['../../../components/modal/modal.component.scss'],
+})
+export class CreateDeviceModalComponent extends ModalComponent implements OnInit {
+  device = input<DeviceDto | null>(null);
+  error = signal<string | null>(null);
+  constructor(
+    protected deviceService: DeviceService,
+    protected modalOpts: ModalOpts
+  ) {
+    super(modalOpts);
+  }
+
+  createModel = signal<CreateDeviceModel>({
+    name: '',
+    manufacturer: '',
+    type: '',
+    os: '',
+    osVersion: '',
+    processor: '',
+    ram: '',
+    description: '',
+  });
+
+  createForm = form(this.createModel, (schemaPath) => {
+      required(schemaPath.name, {message: 'Device name is required'});
+      required(schemaPath.manufacturer, {message: 'Manufacturer is required'});
+      required(schemaPath.type, {message: 'Device type is required'});
+      required(schemaPath.os, {message: 'Operating system is required'});
+      required(schemaPath.osVersion, {message: 'OS version is required'});
+      required(schemaPath.processor, {message: 'Processor information is required'});
+      required(schemaPath.ram, {message: 'RAM information is required'});
+      required(schemaPath.description, {message: 'Description is required'});
+  });
+
+  override async ngOnInit() {
+  }
+
+  cancelCreate() {
+    this.closeResolved(false);
+  }
+
+  onSubmit(event: Event) {
+    event.preventDefault();
+    submit(this.createForm, {
+      action: async () => {
+        const credentials = this.createModel();
+        this.deviceService.upsertDevice(credentials).then(createdDevice => {
+            this.closeResolved(true);
+          })          .catch(error => {
+            console.error('Error creating device:', error);
+            this.error.set('Failed to create device. Please try again.');
+          });
+        console.log('Creating device with:', credentials);
+      },
+    });
+  }
+}

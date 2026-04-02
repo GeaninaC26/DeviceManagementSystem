@@ -1,6 +1,6 @@
 namespace DeviceManagementSystem.Application.Features.Devices.Commands
 {
-    public class CreateDeviceCommand 
+    public class UpsertDeviceCommand 
     {
         public int Id { get; set; }
         public string Name { get; set; }

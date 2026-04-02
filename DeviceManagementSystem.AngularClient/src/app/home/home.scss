@@ -8,7 +8,6 @@
   height: calc(100vh - var(--top-navbar-height));
   flex-direction: column;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 .device-management-layout {
@@ -20,15 +19,17 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
 .device-list-panel {
   flex: 0 0 50%;
   min-height: 0;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 20px;
   background-color: var(--primary-light);
+  display: flex;
+  flex-direction: column;
 }
 .device-panel{
   flex: 0 0 50%;
@@ -46,7 +47,8 @@ app-device-management {
 }
 
 .device-search{
-  margin-bottom: 12px;
+  margin-bottom: 2rem;
+
 }
 
 .device-search-input {
@@ -68,6 +70,26 @@ app-device-management {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-color);
+  min-width: 120px;
+  text-align: center;
 }
 
 .device-item {

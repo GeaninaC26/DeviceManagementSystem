@@ -1,25 +1,25 @@
 <div class="device-management-card card">
 
-  <ng-container *ngIf="selectedDevice; else noSelection">
+  <ng-container *ngIf="selectedDevice(); else noSelection">
     <div class="card-body">
       <!-- User Details -->
       <div class="user-details mb-4">
         <h4>Assigned User</h4>
-        <p *ngIf="user"><strong>Name:</strong> {{ user.name }} (Location: {{ user.location }})</p>
-        <p *ngIf="!user" class="text-secondary">No user assigned to this device.</p>
+        <p *ngIf="user()"><strong>Name:</strong> {{ user().name }} (Location: {{ user().location }})</p>
+        <p *ngIf="!user()" class="text-secondary">No user assigned to this device.</p>
       </div>
 
       <hr>
       <!-- Device Details -->
       <div class="device-details mt-4">
         <h4>Selected Device</h4>
-        <p><strong>Name:</strong> {{ selectedDevice.name }}</p>
-        <p><strong>Manufacturer:</strong> {{ selectedDevice.manufacturer }}</p>
-        <p><strong>Type:</strong> {{ selectedDevice.type }}</p>
-        <p><strong>OS:</strong> {{ selectedDevice.os }} {{ selectedDevice.osVersion }}</p>
-        <p><strong>Processor:</strong> {{ selectedDevice.processor }}</p>
-        <p><strong>RAM:</strong> {{ selectedDevice.ram }}</p>
-        <p><strong>Description:</strong> {{ selectedDevice.description }}</p>
+        <p><strong>Name:</strong> {{ selectedDevice().name }}</p>
+        <p><strong>Manufacturer:</strong> {{ selectedDevice().manufacturer }}</p>
+        <p><strong>Type:</strong> {{ selectedDevice().type }}</p>
+        <p><strong>OS:</strong> {{ selectedDevice().os }} {{ selectedDevice().osVersion }}</p>
+        <p><strong>Processor:</strong> {{ selectedDevice().processor }}</p>
+        <p><strong>RAM:</strong> {{ selectedDevice().ram }}</p>
+        <p><strong>Description:</strong> {{ selectedDevice().description }}</p>
       </div>
     </div>
   </ng-container>
@@ -31,11 +31,42 @@
   </ng-template>
 
   <div class="card-footer">
-    <ng-container *ngIf="selectedDevice">
-      <button class="btn btn-secondary" (click)="cancelled.emit()">Unassign</button>
-      <button class="btn btn-primary" (click)="cancelled.emit()">Edit Device</button>
-      <button class="btn btn-danger" (click)="cancelled.emit()">Delete Device</button>
+    <ng-container *ngIf="selectedDevice()">
+      @if (!user()){
+        <button class="btn btn-primary" (click)="openAssignModal(); $event.preventDefault()">Assign</button>
+      }@else{
+      <button class="btn btn-secondary" (click)="openUnassignModal(); $event.preventDefault()">Unassign</button>
+      }
+      <button class="btn btn-primary" (click)="openEditModal(); $event.preventDefault()">Edit</button>
+      <button class="btn btn-primary" (click)="openDeleteModal(); $event.preventDefault()">Delete</button>
     </ng-container>
+    <button class="btn btn-primary" (click)="openCreateModal()">Add Device</button>
     <button class="btn btn-secondary" (click)="cancelled.emit()">Close</button>
   </div>
 </div>
+
+<!-- Confirmation Modal -->
+<app-confirm-modal
+  *ngIf="showConfirmModal"
+  [title]="modalTitle"
+  [message]="modalMessage"
+  (closeEvent)="onConfirmModalClose($event)">
+</app-confirm-modal>
+
+<!-- Assign Modal -->
+<app-assign-device-modal
+  *ngIf="showAssignModal"
+  [device]="selectedDevice()"
+  (closeEvent)="onAssignModalClose($event)">
+</app-assign-device-modal>
+
+<app-create-device-modal
+  *ngIf="showCreateModal"
+  (closeEvent)="onCreateModalClose($event)">
+</app-create-device-modal>
+
+<app-edit-device-modal
+  *ngIf="showEditModal"
+  [device]="selectedDevice()"
+  (closeEvent)="onEditModalClose($event)">
+</app-edit-device-modal>
