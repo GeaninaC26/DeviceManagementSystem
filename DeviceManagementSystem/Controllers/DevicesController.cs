@@ -58,5 +58,12 @@ namespace DeviceManagementSystem.Controllers
             var devices = await _deviceService.GetDevicesForUserAsync(userId, token);
             return Ok(devices);
         }
+
+        [HttpPost("generateDescription")]
+        public async Task<ActionResult<string>> GenerateDeviceDescription([FromBody] GenerateDeviceDescriptionCommand command)
+        {
+            return await _deviceService.GenerateDeviceDescriptionAsync(command);
+            // return Ok("This is a placeholder description for the device.");
+        }
     }
 }

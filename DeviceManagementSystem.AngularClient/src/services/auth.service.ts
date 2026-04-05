@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { UserDto } from '../contracts/user.dto';
 import { UserService } from './user.service';
+import { RoleEnum } from '../contracts/enums/role.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class AuthService {
   async register(payload: { name: string; location: string; email: string; password: string }): Promise<void> {
     await this.userService.upsertUser({
       ...payload,
-      role: 'User',
+      role: RoleEnum.User,
       id: 0
     });
   }

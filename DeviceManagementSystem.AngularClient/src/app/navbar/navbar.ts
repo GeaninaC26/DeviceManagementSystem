@@ -6,7 +6,7 @@ import { RoleEnum } from "../../contracts/enums/role.enum";
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.scss'],
   standalone: true

@@ -63,8 +63,12 @@ export class DeviceManagementComponent implements OnChanges {
 
   openUnassignModal() {
     const device = this.selectedDevice();
-    const user = this.isAdmin() ? this.user() : this.currentUser();
-
+    var user;
+    if(!this.isAdmin()){
+      user = this.user();
+    }else{
+      user = this.currentUser();
+    }
     if (!device || !user) return;
 
     this.modalTitle = 'Unassign Device';

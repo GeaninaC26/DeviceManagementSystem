@@ -2,12 +2,13 @@ import { Injectable } from "@angular/core";
 import { HttpService } from "./http.service";
 import { UserDto } from "../contracts/user.dto";
 import { DeviceDto } from "../contracts/device.dto";
+import { GenerateDeviceDescriptionCommand } from "../contracts/commands/description-generation.command";
 
 @Injectable({
   providedIn: 'root'
 })
 export class DeviceService {
-  private url = 'https://localhost:7250/api/devices';
+  private url = '/api/devices';
 
   constructor(private http: HttpService) {}
 
@@ -33,6 +34,10 @@ export class DeviceService {
 
   async deleteDevice(id: number): Promise<void> {
     await this.http.delete(`${this.url}/${id}`);
+  }
+
+  async generateDeviceDescription(deviceInfo: any): Promise<string> {
+    return this.http.postText(`${this.url}/generateDescription`, deviceInfo);
   }
 
 }

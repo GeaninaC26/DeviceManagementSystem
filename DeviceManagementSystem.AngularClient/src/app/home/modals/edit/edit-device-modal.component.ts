@@ -6,6 +6,7 @@ import { ModalOpts } from '../../../components/modal/modal-opts';
 import { DeviceService } from '../../../../services/device.service';
 import { form, FormField, required, submit } from '@angular/forms/signals';
 import { extractApiErrorMessage } from '../../../../services/api-error.util';
+import { GenerateDeviceDescriptionCommand } from '../../../../contracts/commands/description-generation.command';
 
 interface EditDeviceModel {
   name: string;
@@ -28,6 +29,7 @@ interface EditDeviceModel {
 export class EditDeviceModalComponent extends ModalComponent implements OnInit {
   device = input<DeviceDto | null>(null);
   error = signal<string | null>(null);
+  isGeneratingDescription = signal(false);
 
   constructor(
     protected deviceService: DeviceService,
@@ -77,6 +79,41 @@ export class EditDeviceModalComponent extends ModalComponent implements OnInit {
 
   cancelEdit() {
     this.closeResolved(false);
+  }
+
+  async generateDescription() {
+    const model = this.editModel();
+
+    if (!model.name || !model.manufacturer || !model.type || !model.os || !model.osVersion || !model.processor || !model.ram) {
+      this.error.set('Please complete the device fields first, then generate the description.');
+      return;
+    }
+
+    this.error.set(null);
+    this.isGeneratingDescription.set(true);
+
+    try {
+      const generatedDescription = await this.deviceService.generateDeviceDescription(
+        new GenerateDeviceDescriptionCommand({
+          name: model.name,
+          manufacturer: model.manufacturer,
+          type: model.type,
+          os: model.os,
+          osVersion: model.osVersion,
+          processor: model.processor,
+          ram: model.ram,
+        })
+      );
+
+      this.editModel.update((current) => ({
+        ...current,
+        description: (generatedDescription || '').trim(),
+      }));
+    } catch (err) {
+      this.error.set(extractApiErrorMessage(err, 'Failed to generate description. Please try again.'));
+    } finally {
+      this.isGeneratingDescription.set(false);
+    }
   }
 
   onSubmit(event: Event) {

@@ -7,7 +7,7 @@ import { UserDeviceDto } from "../contracts/user-device.dto";
   providedIn: 'root'
 })
 export class UserDeviceService {
-  private url = 'https://localhost:7250/api/userDevices';
+  private url = '/api/userDevices';
 
   constructor(private http: HttpService) {}
 

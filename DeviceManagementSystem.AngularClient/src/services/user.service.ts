@@ -7,7 +7,7 @@ import { AuthResponseDto } from "../contracts/auth-response.dto";
   providedIn: 'root'
 })
 export class UserService {
-  private url = 'https://localhost:7250/api/users';
+  private url = '/api/users';
 
   constructor(private http: HttpService) {}
 
@@ -19,7 +19,7 @@ export class UserService {
     return this.http.get(`${this.url}/${id}`);
   }
 
-  async upsertUser(user: any): Promise<UserDto> {
+  async upsertUser(user: UserDto): Promise<UserDto> {
     return this.http.post(this.url, user);
   }
 

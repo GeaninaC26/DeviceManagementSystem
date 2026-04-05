@@ -3,17 +3,21 @@ using DeviceManagementSystem.Application.Contracts;
 using DeviceManagementSystem.Application.Features.Devices.Commands;
 using DeviceManagementSystem.Application.Mappers;
 using DeviceManagementSystem.Domain.Entities;
-
+using Google.GenAI;
+using Google.GenAI.Types;
+using Microsoft.Extensions.Configuration;
 namespace DeviceManagementSystem.Application.Features.Devices
 {
     public class DeviceService
     {
         private readonly IDeviceRepository _deviceRepository;
         private readonly DeviceMapper _deviceMapper;
-        public DeviceService(IDeviceRepository deviceRepository, DeviceMapper deviceMapper)
+        private readonly IConfiguration _configuration;
+        public DeviceService(IDeviceRepository deviceRepository, DeviceMapper deviceMapper, IConfiguration configuration)
         {
             _deviceRepository = deviceRepository;
             _deviceMapper = deviceMapper;
+            _configuration = configuration;
         }
 
         public async Task<DeviceDto> GetDeviceByIdAsync(int id, CancellationToken token)
@@ -23,11 +27,11 @@ namespace DeviceManagementSystem.Application.Features.Devices
                 throw new ArgumentException("Device ID must be greater than 0", nameof(id));
 
             var device = await _deviceRepository.GetByIdAsync(id);
-            
+
             // Check if device exists
             if (device == null)
                 throw new Exception($"Device with ID {id} not found");
-            
+
             return await _deviceMapper.PrepareItemAsync(device, token);
         }
 
@@ -120,13 +124,42 @@ namespace DeviceManagementSystem.Application.Features.Devices
                 throw new ArgumentException("Device ID must be greater than 0", nameof(id));
 
             var device = await _deviceRepository.GetByIdAsync(id);
-            
+
             // Check if device exists
             if (device == null)
                 throw new Exception($"Device with ID {id} not found");
-            
+
             await _deviceRepository.DeleteAsync(device.Id);
         }
 
+        public async Task<string> GenerateDeviceDescriptionAsync(GenerateDeviceDescriptionCommand command)
+        {
+            var client = new Client(apiKey: _configuration["GEMINI_API_KEY"]);
+
+            var response = await client.Models.GenerateContentAsync(
+                model: "gemini-3-flash-preview", contents:
+                $@"
+                Act as a professional IT Asset Manager. Generate a concise, human-readable summary for a device.
+    
+                ### Instructions:
+                1. Analyze the specs (RAM, Processor) to determine the performance tier (e.g., 'high-performance', 'entry-level', 'powerful').
+                2. Identify the primary use case (e.g., 'daily business use', 'intensive multitasking', 'mobile productivity').
+                3. Output a single, elegant sentence that combines the Manufacturer, Type, and OS.
+                4. **CRITICAL**: Do not list technical numbers (like '{command.RAM}' or '{command.Processor}') in the final string. Use descriptive adjectives instead.
+
+                ### Input Data:
+                - Name: {command.Name}
+                - Manufacturer: {command.Manufacturer}
+                - Type: {command.Type}
+                - OS: {command.OS} {command.OSVersion}
+                - Processor: {command.Processor}
+                - RAM: {command.RAM}
+
+                ### Expected Format:
+                ""A [performance adjective] [Manufacturer] [Type] running [OS], suitable for [use case].""
+                ");
+
+            return response.Candidates[0].Content.Parts[0].Text.Trim();
+        }
     }
 }

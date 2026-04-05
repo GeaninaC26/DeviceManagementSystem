@@ -20,6 +20,10 @@ export class HttpService {
     return firstValueFrom(this.http.post<T>(path, body));
   }
 
+  postText(path: string, body: any) {
+    return firstValueFrom(this.http.post(path, body, { responseType: 'text' }));
+  }
+
   put<T>(path: string, body: any) {
     return firstValueFrom(this.http.put<T>(path, body));
   }
