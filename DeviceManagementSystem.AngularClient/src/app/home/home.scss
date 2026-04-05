@@ -1,6 +1,6 @@
 .device-management {
-  --top-navbar-height: 6.5em;
-  padding: 2rem;
+  --top-navbar-height: 5.5rem;
+  padding: 1rem 2rem 0rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -31,10 +31,11 @@
   display: flex;
   flex-direction: column;
 }
+
 .device-panel{
   flex: 0 0 50%;
   min-height: 0;
-  overflow: hidden; /* Prevent this panel from scrolling itself, let the card-body handle it */
+  overflow: hidden;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -47,8 +48,7 @@ app-device-management {
 }
 
 .device-search{
-  margin-bottom: 2rem;
-
+  margin-bottom: 1rem;
 }
 
 .device-search-input {
@@ -69,7 +69,7 @@ app-device-management {
 .device-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 5px;
   flex: 1;
   overflow-y: auto;
 }
@@ -113,7 +113,7 @@ app-device-management {
 }
 
 .device-name {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   margin-bottom: 4px;
 }

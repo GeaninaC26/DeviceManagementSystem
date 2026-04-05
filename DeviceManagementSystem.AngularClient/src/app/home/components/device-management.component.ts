@@ -29,6 +29,7 @@ export class DeviceManagementComponent implements OnChanges {
   readonly assigned = output<DeviceDto>();
   readonly created = output<DeviceDto>();
   readonly assignModalClosed = output<void>();
+  readonly currentUser = input<UserDto | null>(null);
 
   showConfirmModal = false;
   showAssignModal = false;

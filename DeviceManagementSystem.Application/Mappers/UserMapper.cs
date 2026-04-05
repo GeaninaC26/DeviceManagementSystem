@@ -15,7 +15,8 @@ namespace DeviceManagementSystem.Application.Mappers
                 Id = entity.Id,
                 Name = entity.Name,
                 Role = entity.Role,
-                Location = entity.Location
+                Location = entity.Location,
+                Email = entity.Email
             };
             return Task.FromResult(dto);
         }

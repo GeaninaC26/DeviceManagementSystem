@@ -1,8 +1,10 @@
 using DeviceManagementSystem.Application.Abstractions;
 using DeviceManagementSystem.Application.Contracts;
+using DeviceManagementSystem.Application.Features.Users.Commands;
 using DeviceManagementSystem.Application.Mappers;
 using DeviceManagementSystem.Domain.Core;
 using DeviceManagementSystem.Domain.Entities;
+using Scrypt;
 
 namespace DeviceManagementSystem.Application.Features.Users
 {
@@ -16,6 +18,55 @@ namespace DeviceManagementSystem.Application.Features.Users
             _userRepository = userRepository;
         }
 
+        public async Task<UserDto> AuthenticateAsync(string email, string password)
+        {
+            // Validate input
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("Email is required", nameof(email));
+
+            if (string.IsNullOrWhiteSpace(password))
+                throw new ArgumentException("Password is required", nameof(password));
+
+            var user = await _userRepository.GetByEmailAsync(email);
+            
+            if (user == null)
+                throw new KeyNotFoundException($"User with email {email} not found");
+            
+            if (!VerifyPassword(password, user.PasswordHash))
+                throw new UnauthorizedAccessException("Invalid password");
+
+            return await _userMapper.PrepareItemAsync(user, CancellationToken.None);
+        }
+
+        private bool VerifyPassword(string password, string passwordHash)
+        {
+            if (string.IsNullOrWhiteSpace(passwordHash))
+            {
+                return false;
+            }
+
+            if (password == passwordHash)
+            {
+                return true;
+            }
+
+            try
+            {
+                ScryptEncoder encoder = new ScryptEncoder();
+                return encoder.Compare(password, passwordHash);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private string HashPassword(string password)
+        {
+            var encoder = new ScryptEncoder();
+            return encoder.Encode(password);
+        }
+
         public async Task<UserDto> GetUserByIdAsync(int id)
         {
             // Validate ID
@@ -26,7 +77,7 @@ namespace DeviceManagementSystem.Application.Features.Users
             
             // Check if user exists
             if (user == null)
-                throw new Exception($"User with ID {id} not found");
+                throw new KeyNotFoundException($"User with ID {id} not found");
             
             return await _userMapper.PrepareItemAsync(user, CancellationToken.None);
         }
@@ -37,23 +88,49 @@ namespace DeviceManagementSystem.Application.Features.Users
             return (await _userMapper.PrepareItemsAsync(users, CancellationToken.None)).ToList();
         }
 
-        public async Task UpsertUserAsync(UserDto userDto)
+        public async Task UpsertUserAsync(UpsertUserCommand userCommand)
         {
-            // Validate DTO
-            if (userDto == null)
-                throw new ArgumentNullException(nameof(userDto), "User data cannot be null");
+            // Validate command
+            if (userCommand == null)
+                throw new ArgumentNullException(nameof(userCommand), "User data cannot be null");
 
             // Validate required fields
-            if (string.IsNullOrWhiteSpace(userDto.Name))
-                throw new ArgumentException("User name is required", nameof(userDto.Name));
+            if (string.IsNullOrWhiteSpace(userCommand.Name))
+                throw new ArgumentException("User name is required", nameof(userCommand.Name));
 
-            if (userDto.Role == null)
-                throw new ArgumentException("User role is required", nameof(userDto.Role));
+            if (userCommand.Role == null)
+                throw new ArgumentException("User role is required", nameof(userCommand.Role));
 
-            if (string.IsNullOrWhiteSpace(userDto.Location))
-                throw new ArgumentException("User location is required", nameof(userDto.Location));
+            if (string.IsNullOrWhiteSpace(userCommand.Location))
+                throw new ArgumentException("User location is required", nameof(userCommand.Location));
 
-            var user = new User(userDto.Name, userDto.Role, userDto.Location);
+            if (string.IsNullOrWhiteSpace(userCommand.Email))
+                throw new ArgumentException("User email is required", nameof(userCommand.Email));
+
+            if (string.IsNullOrWhiteSpace(userCommand.Password))
+                throw new ArgumentException("User password is required", nameof(userCommand.Password));
+            
+            var existingUser = await _userRepository.GetByEmailAsync(userCommand.Email);
+            if (existingUser != null && existingUser.Id != userCommand.Id)
+                throw new InvalidOperationException($"Account with email {userCommand.Email} already exists");
+
+            var passwordHash = HashPassword(userCommand.Password);
+
+            var role = RoleEnum.User;
+            if (!string.IsNullOrWhiteSpace(userCommand.Role) && Enum.TryParse<RoleEnum>(userCommand.Role, true, out var parsedRole))
+            {
+                role = parsedRole;
+            }
+
+            User user;
+            if (userCommand.Id > 0)
+            {
+                user = new User(userCommand.Id, userCommand.Name, role, userCommand.Location, userCommand.Email, passwordHash);
+            }
+            else
+            {
+                user = new User(userCommand.Name, role, userCommand.Location, userCommand.Email, passwordHash);
+            }
             await _userRepository.UpsertAsync(user);
         }
 
@@ -67,7 +144,7 @@ namespace DeviceManagementSystem.Application.Features.Users
             
             // Check if user exists
             if (user == null)
-                throw new Exception($"User with ID {id} not found");
+                throw new KeyNotFoundException($"User with ID {id} not found");
             
             await _userRepository.DeleteAsync(user.Id);
         }

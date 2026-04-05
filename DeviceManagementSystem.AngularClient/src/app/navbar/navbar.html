@@ -4,6 +4,10 @@
       <h3 class="navbar-title">{{ appTitle }}</h3>
     </div>
     <div class="navbar-menu">
+      @if (currentUser()) {
+        <span class="navbar-user">{{ currentUser()?.name }} ({{ roleLabel(currentUser()?.role) }})</span>
+        <button type="button" class="navbar-logout" (click)="logout()">Logout</button>
+      }
     </div>
   </div>
 </nav>

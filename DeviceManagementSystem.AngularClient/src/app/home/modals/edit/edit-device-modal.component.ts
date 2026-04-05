@@ -5,6 +5,7 @@ import { DeviceDto } from '../../../../contracts/device.dto';
 import { ModalOpts } from '../../../components/modal/modal-opts';
 import { DeviceService } from '../../../../services/device.service';
 import { form, FormField, required, submit } from '@angular/forms/signals';
+import { extractApiErrorMessage } from '../../../../services/api-error.util';
 
 interface EditDeviceModel {
   name: string;
@@ -98,7 +99,7 @@ export class EditDeviceModalComponent extends ModalComponent implements OnInit {
           this.closeResolved(true);
         } catch (error) {
           console.error('Error updating device:', error);
-          this.error.set('Failed to update device. Please try again.');
+          this.error.set(extractApiErrorMessage(error, 'Failed to update device. Please try again.'));
         }
       },
     });

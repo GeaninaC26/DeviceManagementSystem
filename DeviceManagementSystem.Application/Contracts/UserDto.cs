@@ -7,5 +7,6 @@ namespace DeviceManagementSystem.Application.Contracts
         public string Name { get; set; }
         public RoleEnum Role { get; set; }
         public string Location { get; set; }
+        public string Email { get; set; }
     }
 }

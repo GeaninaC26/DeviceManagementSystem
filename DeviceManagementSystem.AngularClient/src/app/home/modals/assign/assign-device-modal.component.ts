@@ -6,6 +6,7 @@ import { UserService } from '../../../../services/user.service';
 import { UserDeviceService } from '../../../../services/user-device.service';
 import { ModalOpts } from '../../../components/modal/modal-opts';
 import { ModalComponent } from '../../../components/modal/modal.component';
+import { extractApiErrorMessage } from '../../../../services/api-error.util';
 
 @Component({
   selector: 'app-assign-device-modal',
@@ -16,8 +17,8 @@ import { ModalComponent } from '../../../components/modal/modal.component';
 })
 export class AssignDeviceModalComponent extends ModalComponent implements OnInit {
   device = input<DeviceDto | null>(null);
-
   users = signal<UserDto[]>([]);
+
   selectedUserId = signal<number | null>(null);
   readonly selectedUser = computed(() => {
     const userId = this.selectedUserId();
@@ -47,7 +48,7 @@ export class AssignDeviceModalComponent extends ModalComponent implements OnInit
       this.users.set(await this.userService.getUsers());
     } catch (error) {
       console.error('Error fetching users:', error);
-      this.error.set('Failed to fetch users.');
+      this.error.set(extractApiErrorMessage(error, 'Failed to fetch users.'));
     } finally {
       this.isLoading.set(false);
     }
@@ -72,8 +73,8 @@ export class AssignDeviceModalComponent extends ModalComponent implements OnInit
       this.error.set(null);
       await this.userDeviceService.assignDeviceToUser({ userId, deviceId: device.id });
       this.closeResolved(true);
-    } catch (err: any) {
-      this.error.set(err.message || 'Failed to assign device');
+    } catch (err) {
+      this.error.set(extractApiErrorMessage(err, 'Failed to assign device.'));
     } finally {
       this.isLoading.set(false);
     }

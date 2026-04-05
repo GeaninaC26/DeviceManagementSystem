@@ -8,6 +8,7 @@ import { UserDeviceService } from '../../../../services/user-device.service';
 import { ModalOpts } from '../../../components/modal/modal-opts';
 import { DeviceService } from '../../../../services/device.service';
 import { form, FormField, required, submit } from '@angular/forms/signals';
+import { extractApiErrorMessage } from '../../../../services/api-error.util';
 
 interface CreateDeviceModel {
   name: string;
@@ -75,7 +76,7 @@ export class CreateDeviceModalComponent extends ModalComponent implements OnInit
             this.closeResolved(true);
           })          .catch(error => {
             console.error('Error creating device:', error);
-            this.error.set('Failed to create device. Please try again.');
+            this.error.set(extractApiErrorMessage(error, 'Failed to create device. Please try again.'));
           });
         console.log('Creating device with:', credentials);
       },

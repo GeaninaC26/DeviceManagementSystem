@@ -8,5 +8,6 @@ namespace DeviceManagementSystem.Application.Abstractions
         Task<IEnumerable<User>> GetAllAsync();
         Task UpsertAsync(User entity);
         Task DeleteAsync(int id);
+        Task<User> GetByEmailAsync(string email);
     }
 }

@@ -5,4 +5,5 @@ export class UserDto extends Dto {
   name: string;
   role: RoleEnum;
   location: string;
+  email: string;
 }

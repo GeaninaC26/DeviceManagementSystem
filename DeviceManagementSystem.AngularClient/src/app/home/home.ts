@@ -6,6 +6,8 @@ import { DeviceService } from '../../services/device.service';
 import { UserDeviceService } from '../../services/user-device.service';
 import { DeviceDto } from '../../contracts/device.dto';
 import { DeviceManagementComponent } from './components/device-management.component';
+import { AuthService } from '../../services/auth.service';
+import { extractApiErrorMessage } from '../../services/api-error.util';
 @Component({
   selector: 'app-home',
   imports: [CommonModule, DeviceManagementComponent],
@@ -13,6 +15,7 @@ import { DeviceManagementComponent } from './components/device-management.compon
   styleUrls: ['./home.scss']
 })
 export class Home implements OnInit {
+  readonly currentUser = computed(() => this.authService.currentUser());
   readonly users = signal<UserDto[]>([]);
   readonly devices = signal<DeviceDto[]>([]);
   readonly userDevices = signal<any[]>([]);
@@ -32,7 +35,7 @@ export class Home implements OnInit {
   readonly isLoading = signal(false);
   readonly error = signal<string | null>(null);
   readonly currentPage = signal(1);
-  readonly itemsPerPage = 5;
+  readonly itemsPerPage = 10;
 
   readonly paginatedDevices = computed(() => {
     const allDevices = this.devices();
@@ -44,7 +47,7 @@ export class Home implements OnInit {
   readonly totalPages = computed(() => {
     return Math.ceil(this.devices().length / this.itemsPerPage);
   });
-  constructor(private userService: UserService,
+  constructor(private authService: AuthService, private userService: UserService,
               private deviceService: DeviceService,
               private userDeviceService: UserDeviceService) {
               }
@@ -65,7 +68,7 @@ export class Home implements OnInit {
       console.log('User-Device Associations:', this.userDevices());
     } catch (error) {
       console.error('Error fetching users:', error);
-      this.error.set('Failed to fetch users.');
+      this.error.set(extractApiErrorMessage(error, 'Failed to fetch users.'));
     } finally {
       this.isLoading.set(false);
     }
@@ -91,7 +94,7 @@ export class Home implements OnInit {
       await this.loadData();
     } catch (err) {
       console.error('Failed to delete device:', err);
-      this.error.set('Failed to delete device.');
+      this.error.set(extractApiErrorMessage(err, 'Failed to delete device.'));
       this.isLoading.set(false);
     }
   }
@@ -109,7 +112,7 @@ export class Home implements OnInit {
       await this.loadData();
     } catch (err) {
       console.error('Failed to unassign device:', err);
-      this.error.set('Failed to unassign device.');
+      this.error.set(extractApiErrorMessage(err, 'Failed to unassign device.'));
       this.isLoading.set(false);
     }
   }

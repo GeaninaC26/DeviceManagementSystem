@@ -42,6 +42,7 @@
       <app-device-management
       [selectedDevice]="selectedDevice()"
       [user]="assignedUser()"
+      [currentUser]="currentUser()"
       (cancelled)="clearSelection()"
       (deleted)="onDeviceDeleted($event)"
       (unassigned)="onDeviceUnassigned($event)"

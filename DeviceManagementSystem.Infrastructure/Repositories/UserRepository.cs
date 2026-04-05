@@ -22,8 +22,26 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, Name, Role, Location FROM Users WHERE Id = @Id";
+                command.CommandText = "SELECT Id, Name, Role, Location, Email, PasswordHash FROM Users WHERE Id = @Id";
                 command.Parameters.AddWithValue("@Id", id);
+
+                using var reader = await command.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    return MapReaderToUser(reader);
+                }
+            }
+            return null;
+        }
+
+        public async Task<User> GetByEmailAsync(string email)
+        {
+            using (var connection = _databaseProvider.GetConnection())
+            {
+                await connection.OpenAsync();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id, Name, Role, Location, Email, PasswordHash FROM Users WHERE Email = @Email";
+                command.Parameters.AddWithValue("@Email", email);
 
                 using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
@@ -41,7 +59,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, Name, Role, Location FROM Users";
+                command.CommandText = "SELECT Id, Name, Role, Location, Email, PasswordHash FROM Users";
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -64,18 +82,20 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                     IF EXISTS (SELECT 1 FROM Users WHERE Id = @Id)
                     BEGIN
                         UPDATE Users
-                        SET Name = @Name, Role = @Role, Location = @Location
+                        SET Name = @Name, Role = @Role, Location = @Location, Email = @Email, PasswordHash = @PasswordHash
                         WHERE Id = @Id
                     END
                     ELSE
                     BEGIN
-                        INSERT INTO Users (Name, Role, Location)
-                        VALUES (@Name, @Role, @Location)
+                        INSERT INTO Users (Name, Role, Location, Email, PasswordHash)
+                        VALUES (@Name, @Role, @Location, @Email, @PasswordHash)
                     END";
                 command.Parameters.AddWithValue("@Id", entity.Id);
                 command.Parameters.AddWithValue("@Name", entity.Name);
-                command.Parameters.AddWithValue("@Role", entity.Role.ToString());
+                command.Parameters.AddWithValue("@Role",  entity.Role.ToString());
                 command.Parameters.AddWithValue("@Location", entity.Location);
+                command.Parameters.AddWithValue("@Email", entity.Email);
+                command.Parameters.AddWithValue("@PasswordHash", entity.PasswordHash);
 
                 await command.ExecuteNonQueryAsync();
             }
@@ -99,6 +119,8 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             var name = reader["Name"].ToString();
             var roleString = reader["Role"].ToString();
             var location = reader["Location"].ToString();
+            var email = reader["Email"].ToString();
+            var passwordHash = reader["PasswordHash"].ToString();
 
             // Parse Role enum safely
             if (!Enum.TryParse<RoleEnum>(roleString, out var role))
@@ -106,7 +128,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                 throw new InvalidOperationException($"Invalid role value: {roleString}");
             }
 
-            return new User(id, name, role, location);
+            return new User(id, name, role, location, email, passwordHash);
         }
     }
 }
