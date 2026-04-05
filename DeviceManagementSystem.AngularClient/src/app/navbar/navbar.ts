@@ -8,7 +8,7 @@ import { RoleEnum } from "../../contracts/enums/role.enum";
   selector: 'app-navbar',
   imports: [CommonModule, RouterLink],
   templateUrl: './navbar.html',
-  styleUrls: ['./navbar.css'],
+  styleUrls: ['./navbar.scss'],
   standalone: true
 })
 export class Navbar {

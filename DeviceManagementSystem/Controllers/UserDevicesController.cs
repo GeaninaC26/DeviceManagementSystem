@@ -43,16 +43,6 @@ namespace DeviceManagementSystem.Controllers
             return Ok();
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<ActionResult<List<UserDeviceDto>>> GetUserDevicesByUserId(int userId, CancellationToken token)
-        {
-            // Validate User ID
-            if (userId <= 0)
-                throw new ArgumentException("User ID must be greater than 0", nameof(userId));
-
-            var userDevices = await _userDeviceService.GetByUserIdAsync(userId, token);
-            return Ok(userDevices);
-        }
 
     }
 }

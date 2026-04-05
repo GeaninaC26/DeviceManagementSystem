@@ -8,6 +8,7 @@ import { DeviceDto } from '../../contracts/device.dto';
 import { DeviceManagementComponent } from './components/device-management.component';
 import { AuthService } from '../../services/auth.service';
 import { extractApiErrorMessage } from '../../services/api-error.util';
+import { RoleEnum } from '../../contracts/enums/role.enum';
 @Component({
   selector: 'app-home',
   imports: [CommonModule, DeviceManagementComponent],
@@ -35,7 +36,7 @@ export class Home implements OnInit {
   readonly isLoading = signal(false);
   readonly error = signal<string | null>(null);
   readonly currentPage = signal(1);
-  readonly itemsPerPage = 10;
+  readonly itemsPerPage = 5;
 
   readonly paginatedDevices = computed(() => {
     const allDevices = this.devices();
@@ -57,15 +58,29 @@ export class Home implements OnInit {
   }
   private async loadData() {
     try {
-      this.isLoading.set(true);
-      this.error.set(null);
+      const currentUser = this.currentUser();
+      if (!currentUser) {
+        this.error.set('No authenticated user found.');
+        return;
+      }
 
-      this.users.set(await this.userService.getUsers());
-      this.devices.set(await this.deviceService.getDevices());
-      this.userDevices.set(await this.userDeviceService.getUserDevices());
-      console.log('Users:', this.users());
-      console.log('Devices:', this.devices());
-      console.log('User-Device Associations:', this.userDevices());
+      if (this.currentUser().role === RoleEnum.Admin) {
+        this.isLoading.set(true);
+        this.error.set(null);
+        this.users.set(await this.userService.getUsers());
+        this.devices.set(await this.deviceService.getDevices());
+        this.userDevices.set(await this.userDeviceService.getUserDevices());
+      }else{
+        this.isLoading.set(true);
+        this.error.set(null);
+        const userId = currentUser.id;
+        this.devices.set(await this.deviceService.getDevicesForUser(userId));
+        const userDevices = await this.userDeviceService.getUserDevices();
+        this.userDevices.set(userDevices.filter((ud: any) => ud.userId === userId));
+
+      }
+
+
     } catch (error) {
       console.error('Error fetching users:', error);
       this.error.set(extractApiErrorMessage(error, 'Failed to fetch users.'));
@@ -101,18 +116,25 @@ export class Home implements OnInit {
 
   async onDeviceUnassigned(device: DeviceDto) {
     try {
-      console.log('Unassigning device:', device);
       this.isLoading.set(true);
-      console.log('Current user-device associations before unassigning:', this.userDevices());
-      const ud = this.userDevices().find((u: any) => u.deviceId === device.id);
-      console.log('Found user-device association to delete:', ud);
+      const currentUser = this.currentUser();
+      const ud = this.userDevices().find((u: any) => {
+        if (u.deviceId !== device.id) return false;
+        if (!currentUser || currentUser.role === RoleEnum.Admin) return true;
+        return u.userId === currentUser.id;
+      });
+
       if (ud) {
         await this.userDeviceService.deleteUserDevice(ud.id);
+      } else {
+        this.error.set('Could not find assignment for the selected device.');
+        return;
       }
       await this.loadData();
     } catch (err) {
       console.error('Failed to unassign device:', err);
       this.error.set(extractApiErrorMessage(err, 'Failed to unassign device.'));
+    } finally {
       this.isLoading.set(false);
     }
   }

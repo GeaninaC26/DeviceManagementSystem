@@ -33,7 +33,7 @@
 
   <div class="card-footer">
     <p *ngIf="assignError" class="text-danger" style="margin: 0 0 0.75rem 0;">{{ assignError }}</p>
-    @if (currentUser()?.role === 1) {
+    @if (isAdmin()) {
     <ng-container *ngIf="selectedDevice()">
 
       @if (!user()){
@@ -43,9 +43,18 @@
       }
       <button class="btn btn-primary" (click)="openEditModal(); $event.preventDefault()">Edit</button>
       <button class="btn btn-primary" (click)="openDeleteModal(); $event.preventDefault()">Delete</button>
+
     </ng-container>
     <button class="btn btn-primary" (click)="openCreateModal()">Add Device</button>
     }
+    @if (!isAdmin()) {
+    <ng-container *ngIf="selectedDevice()">
+      <button class="btn btn-secondary" (click)="openUnassignModal(); $event.preventDefault()">Unassign</button>
+    </ng-container>
+
+    <button class="btn btn-primary" (click)="openAssignModal(); $event.preventDefault()">Assign</button>
+    }
+
     <button class="btn btn-secondary" (click)="cancelled.emit()">Close</button>
   </div>
 </div>
@@ -56,7 +65,7 @@
 </app-confirm-modal>
 
 <!-- Assign Modal -->
-<app-assign-device-modal *ngIf="showAssignModal" [device]="selectedDevice()" (closeEvent)="onAssignModalClose($event)">
+<app-assign-device-modal *ngIf="showAssignModal" [mode]="assignModalMode" [device]="selectedDevice()" (closeEvent)="onAssignModalClose($event)">
 </app-assign-device-modal>
 
 <app-create-device-modal *ngIf="showCreateModal" (closeEvent)="onCreateModalClose($event)">

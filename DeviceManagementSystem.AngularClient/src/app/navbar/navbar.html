@@ -3,11 +3,23 @@
     <div class="navbar-brand">
       <h3 class="navbar-title">{{ appTitle }}</h3>
     </div>
-    <div class="navbar-menu">
-      @if (currentUser()) {
-        <span class="navbar-user">{{ currentUser()?.name }} ({{ roleLabel(currentUser()?.role) }})</span>
-        <button type="button" class="navbar-logout" (click)="logout()">Logout</button>
+    <div class="app-activity">
+      @if (currentUser()?.role === 1) {
+          <span class="activity-icon">⚙️</span>
+          <span class="activity-text">Administrator</span>
+      }@else{
+          <span class="activity-icon">📱</span>
+          <span class="activity-text">My Devices</span>
       }
+    </div>
+    <div class="navbar-menu">
+      @if (currentUser().role === 1) {
+        <span class="navbar-user">{{ currentUser()?.name }} ({{ roleLabel(currentUser()?.role) }})</span>
+      }@else{
+        <span class="navbar-user">{{ currentUser()?.name }} </span>
+      }
+        <button type="button" class="btn btn-primary" (click)="logout()">Logout</button>
+
     </div>
   </div>
 </nav>

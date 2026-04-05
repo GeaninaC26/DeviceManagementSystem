@@ -21,11 +21,11 @@ namespace DeviceManagementSystem.Application.Features.UserDevices
                 throw new ArgumentException("User-Device association ID must be greater than 0", nameof(id));
 
             var userDevice = await _userDeviceRepository.GetByIdAsync(id);
-            
+
             // Check if association exists
             if (userDevice == null)
                 throw new Exception($"User-Device association with ID {id} not found");
-            
+
             return await _mapper.PrepareItemAsync(userDevice, token);
         }
 
@@ -55,21 +55,12 @@ namespace DeviceManagementSystem.Application.Features.UserDevices
                 throw new ArgumentException("User-Device association ID must be greater than 0", nameof(id));
 
             var userDevice = await _userDeviceRepository.GetByIdAsync(id);
-            
+
             // Check if association exists
             if (userDevice == null)
                 throw new Exception($"User-Device association with ID {id} not found");
-            
+
             await _userDeviceRepository.DeleteAsync(userDevice.Id);
-        }
-
-        public async Task<List<UserDeviceDto>> GetByUserIdAsync(int userId, CancellationToken token)
-        {
-            if (userId <= 0)
-                throw new ArgumentException("User ID must be greater than 0", nameof(userId));
-
-            var userDevices = await _userDeviceRepository.GetByUserIdAsync(userId);
-            return (await _mapper.PrepareItemsAsync(userDevices, token)).ToList();
         }
     }
 }

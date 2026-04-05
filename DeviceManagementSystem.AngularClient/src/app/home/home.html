@@ -41,7 +41,7 @@
     <div class="device-panel">
       <app-device-management
       [selectedDevice]="selectedDevice()"
-      [user]="assignedUser()"
+      [user]="currentUser()?.role === 1 ? assignedUser() : currentUser()"
       [currentUser]="currentUser()"
       (cancelled)="clearSelection()"
       (deleted)="onDeviceDeleted($event)"

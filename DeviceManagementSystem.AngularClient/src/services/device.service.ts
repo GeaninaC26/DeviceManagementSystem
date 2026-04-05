@@ -19,6 +19,14 @@ export class DeviceService {
     return this.http.get(`${this.url}/${id}`);
   }
 
+  async getUnassignedDevices(): Promise<DeviceDto[]> {
+    return this.http.get(`${this.url}/unassigned`);
+  }
+
+  async getDevicesForUser(userId: number): Promise<DeviceDto[]> {
+    return this.http.get(`${this.url}/user/${userId}`);
+  }
+
   async upsertDevice(device: any): Promise<DeviceDto> {
     return this.http.post(this.url, device);
   }

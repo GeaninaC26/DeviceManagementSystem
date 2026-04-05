@@ -8,5 +8,7 @@ namespace DeviceManagementSystem.Application.Abstractions
         Task<IEnumerable<Device>> GetAllAsync();
         Task UpsertAsync(Device entity);
         Task DeleteAsync(int id);
+        Task<List<Device>> GetUnassignedDevicesAsync();
+        Task<List<Device>> GetDevicesForUserAsync(int userId);
     }
 }

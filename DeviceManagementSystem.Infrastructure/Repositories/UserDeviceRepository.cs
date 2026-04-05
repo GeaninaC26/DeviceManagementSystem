@@ -94,6 +94,8 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             }
         }
 
+    
+
         public async Task DeleteAsync(int id)
         {
             using (var connection = _databaseProvider.GetConnection())
@@ -107,6 +109,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             }
         }
 
+
         private UserDevice MapReaderToUserDevice(SqlDataReader reader)
         {
             var id = (int)reader["Id"];
@@ -115,5 +118,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
 
             return new UserDevice(id, userId, deviceId);
         }
+
+
     }
 }

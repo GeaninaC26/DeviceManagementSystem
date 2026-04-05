@@ -37,6 +37,12 @@ namespace DeviceManagementSystem.Application.Features.Devices
             return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
+        public async Task<List<DeviceDto>> GetUnassignedDevicesAsync(CancellationToken token)
+        {
+            var devices = await _deviceRepository.GetUnassignedDevicesAsync();
+            return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
+        }
+
         public async Task UpsertDeviceAsync(UpsertDeviceCommand command)
         {
             // Validate command
@@ -96,6 +102,15 @@ namespace DeviceManagementSystem.Application.Features.Devices
                 );
             }
             await _deviceRepository.UpsertAsync(device);
+        }
+
+        public async Task<List<DeviceDto>> GetDevicesForUserAsync(int userId, CancellationToken token)
+        {
+            if (userId <= 0)
+                throw new ArgumentException("User ID must be greater than 0", nameof(userId));
+
+            var devices = await _deviceRepository.GetDevicesForUserAsync(userId);
+            return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
         public async Task DeleteDeviceAsync(int id)

@@ -14,7 +14,7 @@ export class ModalComponent implements OnInit, OnDestroy{
   readonly closeOutsideClick = input<boolean>(true);
   readonly showCloseButton = input<boolean>(true);
   readonly size = input<'small' | 'medium' | 'large' | "modal-xl">();
-  readonly closeEvent = output<void>();
+  readonly closeEvent = output<any>();
 
   scrollYOnOpen = 0;
 
@@ -28,8 +28,8 @@ export class ModalComponent implements OnInit, OnDestroy{
     this.enableBodyScroll();
   }
 
-  close() : void {
-    this.closeEvent.emit();
+  close() : any {
+    this.closeEvent.emit(null);
   }
 
   closeResolved(val?: any) {
@@ -52,7 +52,7 @@ export class ModalComponent implements OnInit, OnDestroy{
   @HostListener('window:popstate', ['$event'])
   onPopState(event: PopStateEvent) {
     event.preventDefault();
-    this.closeEvent.emit();
+    this.closeEvent.emit(null);
   }
 
   disableBodyScroll() {

@@ -106,6 +106,55 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             }
         }
 
+        public async Task<List<Device>> GetUnassignedDevicesAsync()
+        {
+            var devices = new List<Device>();
+            using (var connection = _databaseProvider.GetConnection())
+            {
+                await connection.OpenAsync();
+                var command = connection.CreateCommand();
+                command.CommandText = @"
+                    SELECT d.Id, d.Name, d.Manufacturer, d.Type, d.OS, d.OSVersion, d.Processor, d.RAM, d.Description
+                    FROM Devices d
+                    LEFT JOIN UserDevices ud ON d.Id = ud.DeviceId
+                    WHERE ud.UserId IS NULL";
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        devices.Add(MapReaderToDevice(reader));
+                    }
+                }
+            }
+            return devices;
+        }
+
+        public async Task<List<Device>> GetDevicesForUserAsync(int userId)
+        {
+            var devices = new List<Device>();
+            using (var connection = _databaseProvider.GetConnection())
+            {
+                await connection.OpenAsync();
+                var command = connection.CreateCommand();
+                command.CommandText = @"
+                    SELECT d.Id, d.Name, d.Manufacturer, d.Type, d.OS, d.OSVersion, d.Processor, d.RAM, d.Description
+                    FROM Devices d
+                    INNER JOIN UserDevices ud ON d.Id = ud.DeviceId
+                    WHERE ud.UserId = @UserId";
+                command.Parameters.AddWithValue("@UserId", userId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        devices.Add(MapReaderToDevice(reader));
+                    }
+                }
+            }
+            return devices;
+        }
+
         private Device MapReaderToDevice(SqlDataReader reader)
         {
             var id = (int)reader["Id"];
@@ -120,5 +169,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
 
             return new Device(id, name, manufacturer, deviceType, os, osVersion, processor, ram, description);
         }
+
+
     }
 }

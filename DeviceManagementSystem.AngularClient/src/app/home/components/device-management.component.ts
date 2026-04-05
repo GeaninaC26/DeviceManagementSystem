@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnChanges, input, output } from '@angular/core';
 import { DeviceDto } from '../../../contracts/device.dto';
 import { UserDto } from '../../../contracts/user.dto';
+import { RoleEnum } from '../../../contracts/enums/role.enum';
 import { ConfirmModalComponent } from '../modals/confirm-modal.component';
 import { AssignDeviceModalComponent } from '../modals/assign/assign-device-modal.component';
 import { CreateDeviceModalComponent } from '../modals/create/create-device-modal.component';
@@ -39,6 +40,7 @@ export class DeviceManagementComponent implements OnChanges {
   showEditModal = false;
   isAssigning = false;
   assignError: string | null = null;
+  assignModalMode: 'admin' | 'user' = 'admin';
   modalTitle = '';
   modalMessage = '';
   private pendingAction: 'delete' | 'unassign' | 'assign' | null = null;
@@ -61,7 +63,8 @@ export class DeviceManagementComponent implements OnChanges {
 
   openUnassignModal() {
     const device = this.selectedDevice();
-    const user = this.user();
+    const user = this.isAdmin() ? this.user() : this.currentUser();
+
     if (!device || !user) return;
 
     this.modalTitle = 'Unassign Device';
@@ -73,7 +76,6 @@ export class DeviceManagementComponent implements OnChanges {
   onConfirmModalClose(confirmed: any) {
     this.showConfirmModal = false;
 
-    // Only proceed if exactly true
     if (confirmed === true && this.pendingAction) {
       const device = this.selectedDevice();
       if (!device) return;
@@ -88,31 +90,39 @@ export class DeviceManagementComponent implements OnChanges {
     this.pendingAction = null;
   }
 
-  async onAssignModalClose(selectedUser: UserDto | undefined) {
+  async onAssignModalClose(selection: UserDto | DeviceDto | false | null | undefined) {
     this.showAssignModal = false;
     this.assignModalClosed.emit();
     this.assignError = null;
 
-    if (!selectedUser) return;
+    if (!selection) return;
 
-    const device = this.selectedDevice();
-    if (!device) return;
-
-    try {
-      this.isAssigning = true;
-      await this.userDeviceService.assignDeviceToUser({ userId: selectedUser.id, deviceId: device.id });
-      this.assigned.emit(device);
-    } catch (err) {
-      this.assignError = extractApiErrorMessage(err, 'Failed to assign device.');
-    } finally {
-      this.isAssigning = false;
+    if (this.isAdmin()) {
+      if (!this.isUserDto(selection)) return;
+      const device = this.selectedDevice();
+      if (!device) return;
+      await this.assignDevice(device, selection);
+      return;
     }
+
+    if (!this.isDeviceDto(selection)) return;
+    const currentUser = this.currentUser();
+    if (!currentUser) return;
+
+    await this.assignDevice(selection, currentUser);
   }
 
   openAssignModal() {
-    const device = this.selectedDevice();
-    if (!device) return;
-    this.modalTitle = 'Assign Device';
+    if (this.isAdmin()) {
+      const device = this.selectedDevice();
+      if (!device) return;
+      this.assignModalMode = 'admin';
+      this.modalTitle = 'Assign Device';
+    } else {
+      this.assignModalMode = 'user';
+      this.modalTitle = 'Assign Device to Me';
+    }
+
     this.showAssignModal = true;
   }
 
@@ -141,5 +151,29 @@ export class DeviceManagementComponent implements OnChanges {
       if (!device) return;
       this.created.emit(device);
     }
+  }
+
+  async assignDevice(device: DeviceDto, user: UserDto) {
+    try {
+      this.isAssigning = true;
+      await this.userDeviceService.assignDeviceToUser({ userId: user.id, deviceId: device.id });
+      this.assigned.emit(device);
+    } catch (err) {
+      this.assignError = extractApiErrorMessage(err, 'Failed to assign device.');
+    } finally {
+      this.isAssigning = false;
+    }
+  }
+
+  isAdmin(): boolean {
+    return this.currentUser()?.role === RoleEnum.Admin;
+  }
+
+  private isUserDto(value: UserDto | DeviceDto): value is UserDto {
+    return 'location' in value;
+  }
+
+  private isDeviceDto(value: UserDto | DeviceDto): value is DeviceDto {
+    return 'manufacturer' in value;
   }
 }

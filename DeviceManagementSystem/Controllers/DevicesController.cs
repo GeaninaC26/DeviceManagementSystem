@@ -41,6 +41,22 @@ namespace DeviceManagementSystem.Controllers
             await _deviceService.UpsertDeviceAsync(command);
             return Ok();
         }
-        
+
+        [HttpGet("unassigned")]
+        public async Task<List<DeviceDto>> GetUnassignedDevices(CancellationToken token)
+        {
+            return await _deviceService.GetUnassignedDevicesAsync(token);
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<List<DeviceDto>>> GetDevicesForUser(int userId, CancellationToken token)
+        {
+            // Validate User ID
+            if (userId <= 0)
+                throw new ArgumentException("User ID must be greater than 0", nameof(userId));
+
+            var devices = await _deviceService.GetDevicesForUserAsync(userId, token);
+            return Ok(devices);
+        }
     }
 }

@@ -62,9 +62,10 @@
 
 .navbar-user {
   display: flex;
-  align-items: center;
+  align-items: right;
   gap: var(--space-md);
   margin-left: auto;
+  margin-right: 5px;
 }
 
 .navbar-avatar {
@@ -83,4 +84,20 @@
 
 .navbar-avatar:hover {
   background-color: var(--primary-dark);
+}
+
+.app-activity {
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+}
+
+
+.activity-icon {
+  font-size: 1.2rem;
+  display: inline-block;
+}
+
+.activity-text {
+  letter-spacing: 0.3px;
 }

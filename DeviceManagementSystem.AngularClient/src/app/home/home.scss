@@ -1,6 +1,6 @@
 .device-management {
-  --top-navbar-height: 5.5rem;
-  padding: 1rem 2rem 0rem 2rem;
+  --top-navbar-height: 6.5em;
+  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -48,7 +48,8 @@ app-device-management {
 }
 
 .device-search{
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+
 }
 
 .device-search-input {
@@ -69,7 +70,7 @@ app-device-management {
 .device-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 12px;
   flex: 1;
   overflow-y: auto;
 }
@@ -113,7 +114,7 @@ app-device-management {
 }
 
 .device-name {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 4px;
 }
