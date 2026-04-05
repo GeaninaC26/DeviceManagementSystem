@@ -3,17 +3,16 @@ import { CommonModule } from '@angular/common';
 import { DeviceDto } from '../../../../contracts/device.dto';
 import { UserDto } from '../../../../contracts/user.dto';
 import { UserService } from '../../../../services/user.service';
-import { UserDeviceService } from '../../../../services/user-device.service';
-import { ModalOpts } from '../../../components/modal/modal-opts';
-import { ModalComponent } from '../../../components/modal/modal.component';
 import { extractApiErrorMessage } from '../../../../services/api-error.util';
+import { ModalComponent } from '../../../components/modal/modal.component';
+import { ModalOpts } from '../../../components/modal/modal-opts';
 
 @Component({
   selector: 'app-assign-device-modal',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './assign-device-modal.component.html',
-  styleUrls: ['../../../components/modal/modal.component.scss'],
+  styleUrls: ['../../../../components/modal/modal.component.scss'],
 })
 export class AssignDeviceModalComponent extends ModalComponent implements OnInit {
   device = input<DeviceDto | null>(null);
@@ -30,7 +29,6 @@ export class AssignDeviceModalComponent extends ModalComponent implements OnInit
 
   constructor(
     protected userService: UserService,
-    protected userDeviceService: UserDeviceService,
     protected modalOpts: ModalOpts
   ) {
     super(modalOpts);
@@ -59,25 +57,13 @@ export class AssignDeviceModalComponent extends ModalComponent implements OnInit
   }
 
   async confirmAssign() {
-    const userId = this.selectedUserId();
-    const device = this.device();
+    const selectedUser = this.selectedUser();
 
-    if (!userId || !device) {
-      console.log('User ID or Device is missing');
+    if (!selectedUser) {
       this.error.set('Please select a user');
       return;
     }
-
-    try {
-      this.isLoading.set(true);
-      this.error.set(null);
-      await this.userDeviceService.assignDeviceToUser({ userId, deviceId: device.id });
-      this.closeResolved(true);
-    } catch (err) {
-      this.error.set(extractApiErrorMessage(err, 'Failed to assign device.'));
-    } finally {
-      this.isLoading.set(false);
-    }
+    this.closeResolved(selectedUser);
   }
 
   cancelAssign() {

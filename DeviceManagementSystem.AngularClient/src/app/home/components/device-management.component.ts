@@ -6,6 +6,8 @@ import { ConfirmModalComponent } from '../modals/confirm-modal.component';
 import { AssignDeviceModalComponent } from '../modals/assign/assign-device-modal.component';
 import { CreateDeviceModalComponent } from '../modals/create/create-device-modal.component';
 import { EditDeviceModalComponent } from '../modals/edit/edit-device-modal.component';
+import { UserDeviceService } from '../../../services/user-device.service';
+import { extractApiErrorMessage } from '../../../services/api-error.util';
 
 @Component({
   selector: 'app-device-management',
@@ -35,9 +37,13 @@ export class DeviceManagementComponent implements OnChanges {
   showAssignModal = false;
   showCreateModal = false;
   showEditModal = false;
+  isAssigning = false;
+  assignError: string | null = null;
   modalTitle = '';
   modalMessage = '';
   private pendingAction: 'delete' | 'unassign' | 'assign' | null = null;
+
+  constructor(private userDeviceService: UserDeviceService) {}
 
   ngOnChanges(): void {
     console.log('DeviceManagement component changed');
@@ -82,15 +88,24 @@ export class DeviceManagementComponent implements OnChanges {
     this.pendingAction = null;
   }
 
-  onAssignModalClose(confirmed: any) {
+  async onAssignModalClose(selectedUser: UserDto | undefined) {
     this.showAssignModal = false;
     this.assignModalClosed.emit();
+    this.assignError = null;
 
-    // Only proceed if exactly true
-    if (confirmed === true) {
-      const device = this.selectedDevice();
-      if (!device) return;
+    if (!selectedUser) return;
+
+    const device = this.selectedDevice();
+    if (!device) return;
+
+    try {
+      this.isAssigning = true;
+      await this.userDeviceService.assignDeviceToUser({ userId: selectedUser.id, deviceId: device.id });
       this.assigned.emit(device);
+    } catch (err) {
+      this.assignError = extractApiErrorMessage(err, 'Failed to assign device.');
+    } finally {
+      this.isAssigning = false;
     }
   }
 

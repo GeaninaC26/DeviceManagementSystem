@@ -10,7 +10,6 @@
         <p *ngIf="!user()" class="text-secondary">No user assigned to this device.</p>
       </div>
     }
-
       <hr>
       <!-- Device Details -->
       <div class="device-details mt-4">
@@ -33,6 +32,7 @@
   </ng-template>
 
   <div class="card-footer">
+    <p *ngIf="assignError" class="text-danger" style="margin: 0 0 0.75rem 0;">{{ assignError }}</p>
     @if (currentUser()?.role === 1) {
     <ng-container *ngIf="selectedDevice()">
 
