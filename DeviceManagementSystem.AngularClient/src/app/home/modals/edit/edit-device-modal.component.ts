@@ -33,7 +33,7 @@ export class EditDeviceModalComponent extends ModalComponent implements OnInit {
 
   constructor(
     protected deviceService: DeviceService,
-    protected modalOpts: ModalOpts
+    protected modalOpts: ModalOpts,
   ) {
     super(modalOpts);
   }
@@ -62,7 +62,6 @@ export class EditDeviceModalComponent extends ModalComponent implements OnInit {
 
   override ngOnInit() {
     const currentDevice = this.device();
-    console.log('Editing device:', currentDevice);
     if (currentDevice) {
       this.editModel.set({
         name: currentDevice.name || '',
@@ -84,7 +83,15 @@ export class EditDeviceModalComponent extends ModalComponent implements OnInit {
   async generateDescription() {
     const model = this.editModel();
 
-    if (!model.name || !model.manufacturer || !model.type || !model.os || !model.osVersion || !model.processor || !model.ram) {
+    if (
+      !model.name ||
+      !model.manufacturer ||
+      !model.type ||
+      !model.os ||
+      !model.osVersion ||
+      !model.processor ||
+      !model.ram
+    ) {
       this.error.set('Please complete the device fields first, then generate the description.');
       return;
     }
@@ -102,7 +109,7 @@ export class EditDeviceModalComponent extends ModalComponent implements OnInit {
           osVersion: model.osVersion,
           processor: model.processor,
           ram: model.ram,
-        })
+        }),
       );
 
       this.editModel.update((current) => ({
@@ -110,7 +117,9 @@ export class EditDeviceModalComponent extends ModalComponent implements OnInit {
         description: (generatedDescription || '').trim(),
       }));
     } catch (err) {
-      this.error.set(extractApiErrorMessage(err, 'Failed to generate description. Please try again.'));
+      this.error.set(
+        extractApiErrorMessage(err, 'Failed to generate description. Please try again.'),
+      );
     } finally {
       this.isGeneratingDescription.set(false);
     }
@@ -136,7 +145,9 @@ export class EditDeviceModalComponent extends ModalComponent implements OnInit {
           this.closeResolved(true);
         } catch (error) {
           console.error('Error updating device:', error);
-          this.error.set(extractApiErrorMessage(error, 'Failed to update device. Please try again.'));
+          this.error.set(
+            extractApiErrorMessage(error, 'Failed to update device. Please try again.'),
+          );
         }
       },
     });

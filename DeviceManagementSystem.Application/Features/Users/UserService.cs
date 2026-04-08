@@ -84,7 +84,15 @@ namespace DeviceManagementSystem.Application.Features.Users
 
         public async Task<List<UserDto>> GetAllUsersAsync(string? searchQuery, CancellationToken token)
         {
-            var users = await _userRepository.GetAllAsync(searchQuery, token);
+            var users = await _userRepository.GetAllAsync(token);
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                users = users.Where(u =>
+                    u.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    u.Location.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
             return (await _userMapper.PrepareItemsAsync(users, token)).ToList();
         }
 
@@ -97,9 +105,6 @@ namespace DeviceManagementSystem.Application.Features.Users
             // Validate required fields
             if (string.IsNullOrWhiteSpace(userCommand.Name))
                 throw new ArgumentException("User name is required", nameof(userCommand.Name));
-
-            if (userCommand.Role == null)
-                throw new ArgumentException("User role is required", nameof(userCommand.Role));
 
             if (string.IsNullOrWhiteSpace(userCommand.Location))
                 throw new ArgumentException("User location is required", nameof(userCommand.Location));
@@ -117,10 +122,6 @@ namespace DeviceManagementSystem.Application.Features.Users
             var passwordHash = HashPassword(userCommand.Password);
 
             var role = RoleEnum.User;
-            if (!string.IsNullOrWhiteSpace(userCommand.Role) && Enum.TryParse<RoleEnum>(userCommand.Role, true, out var parsedRole))
-            {
-                role = parsedRole;
-            }
 
             User user;
             if (userCommand.Id > 0)

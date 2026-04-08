@@ -52,7 +52,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return null;
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync(string searchQuery, CancellationToken token)
+        public async Task<IEnumerable<User>> GetAllAsync( CancellationToken token)
         {
             var users = new List<User>();
             using (var connection = _databaseProvider.GetConnection(token))
@@ -66,14 +66,6 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                 {
                     users.Add(MapReaderToUser(reader));
                 }
-            }
-            if (!string.IsNullOrWhiteSpace(searchQuery))
-            {
-                users = users.Where(u =>
-                    u.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
-                    u.Location.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
             }
             return users;
         }
@@ -137,9 +129,5 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return new User(id, name, role, location, email, passwordHash);
         }
 
-        public Task<IEnumerable<User>> GetAllAsync(CancellationToken token)
-        {
-            return GetAllAsync(null, token);
-        }
     }
 }

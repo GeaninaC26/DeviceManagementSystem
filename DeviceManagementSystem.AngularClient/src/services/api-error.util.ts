@@ -35,7 +35,10 @@ function sanitizeServerText(text: string): string {
   return firstLine;
 }
 
-export function extractApiErrorMessage(error: unknown, fallback = 'Something went wrong. Please try again.'): string {
+export function extractApiErrorMessage(
+  error: unknown,
+  fallback = 'Something went wrong. Please try again.',
+): string {
   if (error == null) {
     return fallback;
   }

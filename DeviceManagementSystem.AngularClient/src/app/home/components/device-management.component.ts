@@ -47,9 +47,7 @@ export class DeviceManagementComponent implements OnChanges {
 
   constructor(private userDeviceService: UserDeviceService) {}
 
-  ngOnChanges(): void {
-    console.log('DeviceManagement component changed');
-  }
+  ngOnChanges(): void {}
 
   openDeleteModal() {
     const device = this.selectedDevice();
@@ -64,9 +62,9 @@ export class DeviceManagementComponent implements OnChanges {
   openUnassignModal() {
     const device = this.selectedDevice();
     var user;
-    if(!this.isAdmin()){
+    if (!this.isAdmin()) {
       user = this.user();
-    }else{
+    } else {
       user = this.currentUser();
     }
     if (!device || !user) return;

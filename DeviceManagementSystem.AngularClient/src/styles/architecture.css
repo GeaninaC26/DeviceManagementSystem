@@ -1,16 +1,16 @@
 :root {
-  --primary-color: #0066CC;
-  --primary-dark: #0052A3;
-  --primary-light: #E8F1FA;
-  --accent-color: #FF6B35;
-  --text-primary: #1F2937;
-  --text-secondary: #6B7280;
-  --bg-light: #F9FAFB;
-  --bg-white: #FFFFFF;
-  --border-color: #E5E7EB;
-  --success: #10B981;
-  --danger: #EF4444;
-  --warning: #F59E0B;
+  --primary-color: #0066cc;
+  --primary-dark: #0052a3;
+  --primary-light: #e8f1fa;
+  --accent-color: #ff6b35;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --bg-light: #f9fafb;
+  --bg-white: #ffffff;
+  --border-color: #e5e7eb;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
 
   /* Spacing */
   --space-xs: 4px;
@@ -48,8 +48,8 @@ body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.6;
 }
 

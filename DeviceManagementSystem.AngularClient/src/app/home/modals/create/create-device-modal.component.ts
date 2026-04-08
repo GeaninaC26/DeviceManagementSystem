@@ -35,7 +35,7 @@ export class CreateDeviceModalComponent extends ModalComponent implements OnInit
   isGeneratingDescription = signal(false);
   constructor(
     protected deviceService: DeviceService,
-    protected modalOpts: ModalOpts
+    protected modalOpts: ModalOpts,
   ) {
     super(modalOpts);
   }
@@ -52,23 +52,30 @@ export class CreateDeviceModalComponent extends ModalComponent implements OnInit
   });
 
   createForm = form(this.createModel, (schemaPath) => {
-      required(schemaPath.name, {message: 'Device name is required'});
-      required(schemaPath.manufacturer, {message: 'Manufacturer is required'});
-      required(schemaPath.type, {message: 'Device type is required'});
-      required(schemaPath.os, {message: 'Operating system is required'});
-      required(schemaPath.osVersion, {message: 'OS version is required'});
-      required(schemaPath.processor, {message: 'Processor information is required'});
-      required(schemaPath.ram, {message: 'RAM information is required'});
-      required(schemaPath.description, {message: 'Description is required'});
+    required(schemaPath.name, { message: 'Device name is required' });
+    required(schemaPath.manufacturer, { message: 'Manufacturer is required' });
+    required(schemaPath.type, { message: 'Device type is required' });
+    required(schemaPath.os, { message: 'Operating system is required' });
+    required(schemaPath.osVersion, { message: 'OS version is required' });
+    required(schemaPath.processor, { message: 'Processor information is required' });
+    required(schemaPath.ram, { message: 'RAM information is required' });
+    required(schemaPath.description, { message: 'Description is required' });
   });
 
-  override async ngOnInit() {
-  }
+  override async ngOnInit() {}
 
   async generateDescription() {
     const model = this.createModel();
 
-    if (!model.name || !model.manufacturer || !model.type || !model.os || !model.osVersion || !model.processor || !model.ram) {
+    if (
+      !model.name ||
+      !model.manufacturer ||
+      !model.type ||
+      !model.os ||
+      !model.osVersion ||
+      !model.processor ||
+      !model.ram
+    ) {
       this.error.set('Please complete the device fields first, then generate the description.');
       return;
     }
@@ -86,7 +93,7 @@ export class CreateDeviceModalComponent extends ModalComponent implements OnInit
           osVersion: model.osVersion,
           processor: model.processor,
           ram: model.ram,
-        })
+        }),
       );
 
       this.createModel.update((current) => ({
@@ -94,7 +101,9 @@ export class CreateDeviceModalComponent extends ModalComponent implements OnInit
         description: (generatedDescription || 'lala').trim(),
       }));
     } catch (err) {
-      this.error.set(extractApiErrorMessage(err, 'Failed to generate description. Please try again.'));
+      this.error.set(
+        extractApiErrorMessage(err, 'Failed to generate description. Please try again.'),
+      );
     } finally {
       this.isGeneratingDescription.set(false);
     }
@@ -109,13 +118,17 @@ export class CreateDeviceModalComponent extends ModalComponent implements OnInit
     submit(this.createForm, {
       action: async () => {
         const credentials = this.createModel();
-        this.deviceService.upsertDevice(credentials).then(createdDevice => {
+        this.deviceService
+          .upsertDevice(credentials)
+          .then((createdDevice) => {
             this.closeResolved(true);
-          })          .catch(error => {
+          })
+          .catch((error) => {
             console.error('Error creating device:', error);
-            this.error.set(extractApiErrorMessage(error, 'Failed to create device. Please try again.'));
+            this.error.set(
+              extractApiErrorMessage(error, 'Failed to create device. Please try again.'),
+            );
           });
-        console.log('Creating device with:', credentials);
       },
     });
   }

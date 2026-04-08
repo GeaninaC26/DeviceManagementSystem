@@ -3,8 +3,9 @@ namespace DeviceManagementSystem.Controllers
     using DeviceManagementSystem.Application.Contracts;
     using DeviceManagementSystem.Application.Features.Devices;
     using DeviceManagementSystem.Application.Features.Devices.Commands;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class DevicesController : ControllerBase
@@ -16,6 +17,7 @@ namespace DeviceManagementSystem.Controllers
         }
 
         [HttpGet]
+        [Authorize("Admin")]
         public async Task<List<DeviceDto>> GetAllDevices([FromQuery] string? searchQuery, CancellationToken token)
         {
             return await _deviceService.GetAllDevicesAsync(searchQuery, token);
@@ -28,12 +30,14 @@ namespace DeviceManagementSystem.Controllers
             return Ok(device);
         }
         [HttpDelete("{id}")]
+        [Authorize("Admin")]
         public async Task<IActionResult> DeleteDevice(int id, CancellationToken token)
         {
             await _deviceService.DeleteDeviceAsync(id, token);
             return Ok();
         }
         [HttpPost]
+        [Authorize("Admin")]
         public async Task<IActionResult> UpsertDevice([FromBody] UpsertDeviceCommand command, CancellationToken token   )
         {
             await _deviceService.UpsertDeviceAsync(command, token);
@@ -57,6 +61,7 @@ namespace DeviceManagementSystem.Controllers
         }
 
         [HttpPost("generateDescription")]
+        [Authorize("Admin")]
         public async Task<ActionResult<string>> GenerateDeviceDescription([FromBody] GenerateDeviceDescriptionCommand command, CancellationToken token)
         {
             return await _deviceService.GenerateDeviceDescriptionAsync(command, token);

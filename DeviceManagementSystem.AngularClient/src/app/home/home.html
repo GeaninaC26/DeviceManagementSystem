@@ -2,16 +2,24 @@
   <div class="device-management-layout">
     <div class="device-list-panel">
       <div class="device-search">
-        <input type="text" class="device-search-input" [value]="deviceSearchText()"
-          (input)="onDeviceSearchTextChange($event.target.value)" placeholder="Type to search for device.."
-          aria-label="Type to search for device.." />
+        <input
+          type="text"
+          class="device-search-input"
+          [value]="deviceSearchText()"
+          (input)="onDeviceSearchTextChange($event.target.value)"
+          placeholder="Type to search for device.."
+          aria-label="Type to search for device.."
+        />
       </div>
 
-      <div *ngIf="isLoading()" class="loading"> Loading... </div>
-      <div *ngIf="error()" class="error"> {{ error() }} </div>
+      <div *ngIf="error()" class="error">{{ error() }}</div>
       <div class="device-list">
-        <div *ngFor="let device of paginatedDevices()" class="device-item" (click)="selectDevice(device)"
-          [class.selected]="selectedDevice() && selectedDevice().id === device.id">
+        <div
+          *ngFor="let device of paginatedDevices()"
+          class="device-item"
+          (click)="selectDevice(device)"
+          [class.selected]="selectedDevice() && selectedDevice().id === device.id"
+        >
           <div class="device-name">
             {{ device.name }}
           </div>
@@ -27,30 +35,36 @@
 
       <!-- Pagination Controls -->
       <div class="pagination-controls">
-        <button class="btn btn-sm btn-secondary" (click)="previousPage()" [disabled]="currentPage() === 1">
+        <button
+          class="btn btn-sm btn-secondary"
+          (click)="previousPage()"
+          [disabled]="currentPage() === 1"
+        >
           Previous
         </button>
-        <div class="pagination-info">
-          Page {{ currentPage() }} of {{ totalPages() }}
-        </div>
-        <button class="btn btn-sm btn-secondary" (click)="nextPage()" [disabled]="currentPage() === totalPages()">
+        <div class="pagination-info">Page {{ currentPage() }} of {{ totalPages() }}</div>
+        <button
+          class="btn btn-sm btn-secondary"
+          (click)="nextPage()"
+          [disabled]="currentPage() === totalPages()"
+        >
           Next
         </button>
       </div>
     </div>
     <div class="device-panel">
       <app-device-management
-      [selectedDevice]="selectedDevice()"
-      [user]="currentUser()?.role === 1 ? assignedUser() : currentUser()"
-      [currentUser]="currentUser()"
-      (cancelled)="clearSelection()"
-      (deleted)="onDeviceDeleted($event)"
-      (unassigned)="onDeviceUnassigned($event)"
-      (assigned)="onDeviceAssigned($event)"
-      (assignModalClosed)="onAssignModalClosed()"
-      (created)="onCreateModalClosed()">
+        [selectedDevice]="selectedDevice()"
+        [user]="currentUser()?.role === 1 ? assignedUser() : currentUser()"
+        [currentUser]="currentUser()"
+        (cancelled)="clearSelection()"
+        (deleted)="onDeviceDeleted($event)"
+        (unassigned)="onDeviceUnassigned($event)"
+        (assigned)="onDeviceAssigned($event)"
+        (assignModalClosed)="onAssignModalClosed()"
+        (created)="onCreateModalClosed()"
+      >
       </app-device-management>
     </div>
   </div>
-
 </div>

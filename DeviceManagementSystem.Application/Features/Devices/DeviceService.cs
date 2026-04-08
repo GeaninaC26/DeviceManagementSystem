@@ -37,13 +37,21 @@ namespace DeviceManagementSystem.Application.Features.Devices
 
         public async Task<List<DeviceDto>> GetAllDevicesAsync(string searchQuery, CancellationToken token)
         {
-            var devices = await _deviceRepository.GetAllAsync(searchQuery, token);
+            var devices = await _deviceRepository.GetAllAsync(token);
+            if(!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                devices = FilterAndScoreDevices(devices.ToList(), searchQuery);
+            }
             return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
         public async Task<List<DeviceDto>> GetUnassignedDevicesAsync(string searchQuery, CancellationToken token)
         {
-            var devices = await _deviceRepository.GetUnassignedDevicesAsync(searchQuery, token);
+            var devices = await _deviceRepository.GetUnassignedDevicesAsync(token);
+            if(!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                devices = FilterAndScoreDevices(devices.ToList(), searchQuery);
+            }
             return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
@@ -113,7 +121,11 @@ namespace DeviceManagementSystem.Application.Features.Devices
             if (userId <= 0)
                 throw new ArgumentException("User ID must be greater than 0", nameof(userId));
 
-            var devices = await _deviceRepository.GetDevicesForUserAsync(userId, searchQuery, token);
+            var devices = await _deviceRepository.GetDevicesForUserAsync(userId, token);
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                devices = FilterAndScoreDevices(devices.ToList(), searchQuery);
+            }
             return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
@@ -161,5 +173,38 @@ namespace DeviceManagementSystem.Application.Features.Devices
 
             return response.Candidates[0].Content.Parts[0].Text.Trim();
         }
+
+        private int CalculateScore(Device device, string[] tokens)
+        {
+            int score = 0;
+            foreach (var token in tokens)
+            {
+                if (device.Name?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 10;
+                if (device.Manufacturer?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 5;
+                if (device.Processor?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 3;
+                if (device.RAM?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 1;
+            }
+            return score;
+        }
+
+        private List<Device> FilterAndScoreDevices(List<Device> devices, string searchQuery)
+        {
+            var tokens = searchQuery.ToLowerInvariant()
+                                    .Split(new[] { ' ', ',', '.', '-' }, StringSplitOptions.RemoveEmptyEntries);
+
+            return devices
+                .Select(device => new
+                {
+                    Device = device,
+                    Score = CalculateScore(device, tokens)
+                })
+                .Where(x => x.Score > 0)
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.Device.Name)
+                .Select(x => x.Device)
+                .ToList();
+        }
+
     }
 }
+

@@ -1,6 +1,6 @@
-import { Dto } from "./dto";
+import { Dto } from './dto';
 
-export class UserDeviceDto extends Dto{
+export class UserDeviceDto extends Dto {
   userId: number;
   deviceId: number;
   userName: string;

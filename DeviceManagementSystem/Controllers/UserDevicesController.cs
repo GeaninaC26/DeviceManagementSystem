@@ -4,8 +4,9 @@ namespace DeviceManagementSystem.Controllers
     using DeviceManagementSystem.Application.Features.UserDevices;
     using DeviceManagementSystem.Application.Features.UserDevices.Commands;
     using DeviceManagementSystem.Application.Features.Users;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserDevicesController : ControllerBase
@@ -18,6 +19,7 @@ namespace DeviceManagementSystem.Controllers
         }
 
         [HttpGet]
+        [Authorize("Admin")]
         public async Task<List<UserDeviceDto>> GetAllUserDevices(CancellationToken token)
         {
             return await _userDeviceService.GetAllAsync(token);
@@ -38,7 +40,6 @@ namespace DeviceManagementSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> UnassignDeviceFromUser(int id, CancellationToken token)
         {
-            Console.WriteLine($"Received request to unassign user-device association with ID: {id}");
             await _userDeviceService.UnassignDeviceFromUserAsync(id, token);
             return Ok();
         }

@@ -33,7 +33,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return null;
         }
 
-        public async Task<IEnumerable<Device>> GetAllAsync(string searchQuery = null, CancellationToken token = default)
+        public async Task<IEnumerable<Device>> GetAllAsync(CancellationToken token = default)
         {
             var devices = new List<Device>();
 
@@ -49,10 +49,6 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                     {
                         devices.Add(MapReaderToDevice(reader));
                     }
-                }
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    devices = FilterAndScoreDevices(devices, searchQuery);
                 }
             }
 
@@ -114,7 +110,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             }
         }
 
-        public async Task<List<Device>> GetUnassignedDevicesAsync(string searchQuery, CancellationToken token)
+        public async Task<List<Device>> GetUnassignedDevicesAsync(CancellationToken token)
         {
             var devices = new List<Device>();
             using (var connection = _databaseProvider.GetConnection(token))
@@ -135,15 +131,11 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    devices = FilterAndScoreDevices(devices, searchQuery);
-                }   
             }
             return devices;
         }
 
-        public async Task<List<Device>> GetDevicesForUserAsync(int userId, string? searchQuery, CancellationToken token)
+        public async Task<List<Device>> GetDevicesForUserAsync(int userId, CancellationToken token)
         {
             var devices = new List<Device>();
             using (var connection = _databaseProvider.GetConnection(token))
@@ -165,10 +157,6 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    devices = FilterAndScoreDevices(devices, searchQuery);
-                }
             }
             return devices;
         }
@@ -188,40 +176,5 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return new Device(id, name, manufacturer, deviceType, os, osVersion, processor, ram, description);
         }
 
-                private int CalculateScore(Device device, string[] tokens)
-        {
-            int score = 0;
-            foreach (var token in tokens)
-            {
-                if (device.Name?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 10;
-                if (device.Manufacturer?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 5;
-                if (device.Processor?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 3;
-                if (device.RAM?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 1;
-            }
-            return score;
-        }
-
-        private List<Device> FilterAndScoreDevices(List<Device> devices, string searchQuery)
-        {
-            var tokens = searchQuery.ToLowerInvariant()
-                                    .Split(new[] { ' ', ',', '.', '-' }, StringSplitOptions.RemoveEmptyEntries);
-
-            return devices
-                .Select(device => new
-                {
-                    Device = device,
-                    Score = CalculateScore(device, tokens)
-                })
-                .Where(x => x.Score > 0)
-                .OrderByDescending(x => x.Score)
-                .ThenBy(x => x.Device.Name)
-                .Select(x => x.Device)
-                .ToList();
-        }
-
-        public Task<IEnumerable<Device>> GetAllAsync(CancellationToken token)
-        {
-            return GetAllAsync(null, token);
-        }
     }
 }

@@ -119,7 +119,7 @@
 }
 
 .footer-section a {
-  color: #D1D5DB;
+  color: #d1d5db;
   text-decoration: none;
   font-size: 0.875rem;
   transition: var(--transition);
@@ -136,7 +136,7 @@
   margin-top: var(--space-lg);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 0.875rem;
-  color: #D1D5DB;
+  color: #d1d5db;
 }
 
 .footer-socials {

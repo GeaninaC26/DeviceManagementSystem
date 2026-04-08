@@ -1,10 +1,10 @@
-import { Injectable } from "@angular/core";
-import { HttpService } from "./http.service";
-import { UserDto } from "../contracts/user.dto";
-import { AuthResponseDto } from "../contracts/auth-response.dto";
+import { Injectable } from '@angular/core';
+import { HttpService } from './http.service';
+import { UserDto } from '../contracts/user.dto';
+import { AuthResponseDto } from '../contracts/auth-response.dto';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
   private url = '/api/users';
@@ -12,7 +12,9 @@ export class UserService {
   constructor(private http: HttpService) {}
 
   async getUsers(searchQuery?: string): Promise<UserDto[]> {
-    const url = searchQuery ? `${this.url}?searchQuery=${encodeURIComponent(searchQuery)}` : this.url;
+    const url = searchQuery
+      ? `${this.url}?searchQuery=${encodeURIComponent(searchQuery)}`
+      : this.url;
     return this.http.get(url);
   }
 
@@ -35,5 +37,4 @@ export class UserService {
   async deleteUser(id: number): Promise<void> {
     await this.http.delete(`${this.url}/${id}`);
   }
-
 }

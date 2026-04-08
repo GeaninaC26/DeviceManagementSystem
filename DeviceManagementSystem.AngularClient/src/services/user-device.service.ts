@@ -1,10 +1,10 @@
-import { Injectable } from "@angular/core";
-import { HttpService } from "./http.service";
-import { UserDto } from "../contracts/user.dto";
-import { UserDeviceDto } from "../contracts/user-device.dto";
+import { Injectable } from '@angular/core';
+import { HttpService } from './http.service';
+import { UserDto } from '../contracts/user.dto';
+import { UserDeviceDto } from '../contracts/user-device.dto';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserDeviceService {
   private url = '/api/userDevices';
@@ -24,8 +24,6 @@ export class UserDeviceService {
   }
 
   async deleteUserDevice(id: number): Promise<void> {
-    console.log(`Deleting user-device association with ID: ${id}`);
     await this.http.delete(`${this.url}/${id}`);
-    console.log(`Delete request sent for user-device association with ID: ${id}`);
   }
 }

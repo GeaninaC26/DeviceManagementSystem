@@ -42,7 +42,15 @@ builder.Services
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(
+    options =>
+    {
+        options.AddPolicy("Admin", policy =>
+        {
+            policy.RequireRole("Admin");
+        });
+    }
+);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
@@ -76,7 +84,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
- app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 if (builder.Environment.IsDevelopment())
 {

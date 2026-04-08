@@ -7,7 +7,7 @@ import { AuthService } from '../services/auth.service';
   selector: 'app-root',
   imports: [Navbar, RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App implements OnInit {
   protected readonly title = signal('DeviceManagementSystem.AngularClient');

@@ -1,5 +1,5 @@
-import {ChangeDetectionStrategy, Component, computed, signal} from '@angular/core';
-import {email, form, FormField, required, submit} from '@angular/forms/signals';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { email, form, FormField, required, submit } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { extractApiErrorMessage } from '../../services/api-error.util';
@@ -21,16 +21,19 @@ export class LoginComponent {
   readonly errorMessage = signal<string | null>(null);
   readonly currentUser = computed(() => this.authService.currentUser());
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   loginModel = signal<LoginData>({
     email: '',
     password: '',
   });
   loginForm = form(this.loginModel, (schemaPath) => {
-    required(schemaPath.email, {message: 'Email is required'});
-    email(schemaPath.email, {message: 'Enter a valid email address'});
-    required(schemaPath.password, {message: 'Password is required'});
+    required(schemaPath.email, { message: 'Email is required' });
+    email(schemaPath.email, { message: 'Enter a valid email address' });
+    required(schemaPath.password, { message: 'Password is required' });
   });
   onSubmit(event: Event) {
     event.preventDefault();

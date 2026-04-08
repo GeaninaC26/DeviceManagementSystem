@@ -1,6 +1,6 @@
 export class GenerateDeviceDescriptionCommand {
   name: string;
-  type: string
+  type: string;
   manufacturer: string;
   os: string;
   osVersion: string;

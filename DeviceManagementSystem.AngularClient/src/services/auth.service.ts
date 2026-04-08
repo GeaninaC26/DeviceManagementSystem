@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import { RoleEnum } from '../contracts/enums/role.enum';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private readonly tokenStorageKey = 'dms_auth_token';
@@ -22,11 +22,16 @@ export class AuthService {
     return response.user;
   }
 
-  async register(payload: { name: string; location: string; email: string; password: string }): Promise<void> {
+  async register(payload: {
+    name: string;
+    location: string;
+    email: string;
+    password: string;
+  }): Promise<void> {
     await this.userService.upsertUser({
       ...payload,
       role: RoleEnum.User,
-      id: 0
+      id: 0,
     });
   }
 

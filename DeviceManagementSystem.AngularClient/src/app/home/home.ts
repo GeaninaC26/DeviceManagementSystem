@@ -13,7 +13,7 @@ import { RoleEnum } from '../../contracts/enums/role.enum';
   selector: 'app-home',
   imports: [CommonModule, DeviceManagementComponent],
   templateUrl: './home.html',
-  styleUrls: ['./home.scss']
+  styleUrls: ['./home.scss'],
 })
 export class Home implements OnInit {
   readonly currentUser = computed(() => this.authService.currentUser());
@@ -26,11 +26,11 @@ export class Home implements OnInit {
     if (!selected) return null;
 
     // Find the user-device mapping
-    const userDevice = this.userDevices().find(ud => ud.deviceId === selected.id);
+    const userDevice = this.userDevices().find((ud) => ud.deviceId === selected.id);
     if (!userDevice) return null;
 
     // Find the user details
-    return this.users().find(u => u.id === userDevice.userId) || null;
+    return this.users().find((u) => u.id === userDevice.userId) || null;
   });
   readonly deviceSearchText = signal<string | null>(null);
   readonly isLoading = signal(false);
@@ -48,10 +48,12 @@ export class Home implements OnInit {
   readonly totalPages = computed(() => {
     return Math.ceil(this.devices().length / this.itemsPerPage);
   });
-  constructor(private authService: AuthService, private userService: UserService,
-              private deviceService: DeviceService,
-              private userDeviceService: UserDeviceService) {
-              }
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+    private deviceService: DeviceService,
+    private userDeviceService: UserDeviceService,
+  ) {}
 
   ngOnInit(): void {
     this.loadData();
@@ -63,34 +65,28 @@ export class Home implements OnInit {
         this.error.set('No authenticated user found.');
         return;
       }
-
       if (this.currentUser().role === RoleEnum.Admin) {
         this.isLoading.set(true);
         this.error.set(null);
         this.users.set(await this.userService.getUsers());
-        console.log('Fetched users:', this.users());
         this.devices.set(await this.deviceService.getDevices(this.deviceSearchText()?.toString()));
-        console.log('Fetched devices:', this.devices());
         this.userDevices.set(await this.userDeviceService.getUserDevices());
-        console.log('Fetched user-device mappings:', this.userDevices());
-      }else{
+      } else {
         this.isLoading.set(true);
         this.error.set(null);
         const userId = currentUser.id;
-        this.devices.set(await this.deviceService.getDevicesForUser(userId, this.deviceSearchText()?.toString()));
+        this.devices.set(
+          await this.deviceService.getDevicesForUser(userId, this.deviceSearchText()?.toString()),
+        );
         const userDevices = await this.userDeviceService.getUserDevices();
         this.userDevices.set(userDevices.filter((ud: any) => ud.userId === userId));
-
       }
-
-
     } catch (error) {
       console.error('Error fetching users:', error);
       this.error.set(extractApiErrorMessage(error, 'Failed to fetch users.'));
     } finally {
       this.isLoading.set(false);
     }
-
   }
 
   onDeviceSearchTextChange(text: string) {
@@ -98,7 +94,7 @@ export class Home implements OnInit {
     this.loadData();
   }
 
-  selectDevice(device: DeviceDto) : void {
+  selectDevice(device: DeviceDto): void {
     this.selectedDevice.set(device);
   }
   clearSelection(): void {
@@ -160,7 +156,6 @@ export class Home implements OnInit {
     this.loadData();
   }
 
-
   onDeviceAssigned(_: DeviceDto) {
     this.loadData();
   }
@@ -178,13 +173,13 @@ export class Home implements OnInit {
 
   nextPage() {
     if (this.currentPage() < this.totalPages()) {
-      this.currentPage.update(p => p + 1);
+      this.currentPage.update((p) => p + 1);
     }
   }
 
   previousPage() {
     if (this.currentPage() > 1) {
-      this.currentPage.update(p => p - 1);
+      this.currentPage.update((p) => p - 1);
     }
   }
 }

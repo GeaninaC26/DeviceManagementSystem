@@ -48,7 +48,7 @@ export class AssignDeviceModalComponent extends ModalComponent implements OnInit
   constructor(
     protected userService: UserService,
     protected deviceService: DeviceService,
-    protected modalOpts: ModalOpts
+    protected modalOpts: ModalOpts,
   ) {
     super(modalOpts);
   }

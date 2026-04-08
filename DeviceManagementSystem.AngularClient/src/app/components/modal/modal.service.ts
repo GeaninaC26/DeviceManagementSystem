@@ -1,7 +1,7 @@
-import { ComponentRef, Injectable, Type, ViewContainerRef } from "@angular/core";
-import { ModalComponent } from "./modal.component";
+import { ComponentRef, Injectable, Type, ViewContainerRef } from '@angular/core';
+import { ModalComponent } from './modal.component';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ModalService {
   private viewContainer: ViewContainerRef;
   private instances: ComponentRef<ModalComponent>[] = [];
@@ -10,9 +10,14 @@ export class ModalService {
     this.viewContainer = viewContainer;
   }
 
-  async show<TModal extends ModalComponent>(modal: Type<TModal>, setOptions: (ref: ComponentRef<TModal>) => void = null): Promise<any> {
+  async show<TModal extends ModalComponent>(
+    modal: Type<TModal>,
+    setOptions: (ref: ComponentRef<TModal>) => void = null,
+  ): Promise<any> {
     if (!this.viewContainer) {
-      throw new Error("ModalService: ViewContainerRef is not set. Please call setViewContainer() before showing modals.");
+      throw new Error(
+        'ModalService: ViewContainerRef is not set. Please call setViewContainer() before showing modals.',
+      );
     }
 
     const ref = this.viewContainer.createComponent(modal);
@@ -25,7 +30,7 @@ export class ModalService {
     return new Promise<any>((resolve) => {
       const sub = ref.instance.closeEvent.subscribe((rsp: any) => {
         sub.unsubscribe();
-        this.instances = this.instances.filter(instance => instance !== ref);
+        this.instances = this.instances.filter((instance) => instance !== ref);
         ref.destroy();
         resolve(rsp);
       });

@@ -8,18 +8,17 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: LoginComponent
+    component: LoginComponent,
   },
   {
     path: 'device-management',
     pathMatch: 'full',
     canActivate: [authGuard],
-    component: Home
+    component: Home,
   },
   {
     path: 'register',
     pathMatch: 'full',
-    component: RegisterComponent
-  }
-
+    component: RegisterComponent,
+  },
 ];

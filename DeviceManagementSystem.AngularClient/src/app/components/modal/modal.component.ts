@@ -1,24 +1,24 @@
-import { CommonModule } from "@angular/common";
-import { Component, Host, HostListener, input, OnDestroy, OnInit, output } from "@angular/core";
-import { ModalOpts } from "./modal-opts";
+import { CommonModule } from '@angular/common';
+import { Component, Host, HostListener, input, OnDestroy, OnInit, output } from '@angular/core';
+import { ModalOpts } from './modal-opts';
 
 @Component({
   selector: 'app-modal',
   imports: [CommonModule],
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
-  standalone: true
+  standalone: true,
 })
-export class ModalComponent implements OnInit, OnDestroy{
+export class ModalComponent implements OnInit, OnDestroy {
   readonly title = input<string>('Modal Title');
   readonly closeOutsideClick = input<boolean>(true);
   readonly showCloseButton = input<boolean>(true);
-  readonly size = input<'small' | 'medium' | 'large' | "modal-xl">();
+  readonly size = input<'small' | 'medium' | 'large' | 'modal-xl'>();
   readonly closeEvent = output<any>();
 
   scrollYOnOpen = 0;
 
-  constructor(public opts: ModalOpts){}
+  constructor(public opts: ModalOpts) {}
 
   ngOnInit(): void {
     this.disableBodyScroll();
@@ -28,12 +28,12 @@ export class ModalComponent implements OnInit, OnDestroy{
     this.enableBodyScroll();
   }
 
-  close() : any {
+  close(): any {
     this.closeEvent.emit(null);
   }
 
   closeResolved(val?: any) {
-    if(!val) val = true;
+    if (!val) val = true;
     this.closeEvent.emit(val);
   }
 
@@ -68,7 +68,4 @@ export class ModalComponent implements OnInit, OnDestroy{
     document.body.style.width = '';
     window.scrollTo(0, this.scrollYOnOpen);
   }
-
-
-
 }

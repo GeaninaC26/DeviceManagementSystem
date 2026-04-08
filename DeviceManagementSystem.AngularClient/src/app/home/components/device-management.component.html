@@ -1,16 +1,17 @@
 <div class="device-management-card card">
-
   <ng-container *ngIf="selectedDevice(); else noSelection">
     <div class="card-body">
       @if (currentUser()?.role === 1) {
-      <!-- User Details -->
-      <div class="user-details mb-4">
-        <h4>Assigned User</h4>
-        <p *ngIf="user()"><strong>Name:</strong> {{ user().name }} (Location: {{ user().location }})</p>
-        <p *ngIf="!user()" class="text-secondary">No user assigned to this device.</p>
-      </div>
-    }
-      <hr>
+        <!-- User Details -->
+        <div class="user-details mb-4">
+          <h4>Assigned User</h4>
+          <p *ngIf="user()">
+            <strong>Name:</strong> {{ user().name }} (Location: {{ user().location }})
+          </p>
+          <p *ngIf="!user()" class="text-secondary">No user assigned to this device.</p>
+        </div>
+      }
+      <hr />
       <!-- Device Details -->
       <div class="device-details mt-4">
         <h4>Selected Device</h4>
@@ -32,27 +33,37 @@
   </ng-template>
 
   <div class="card-footer">
-    <p *ngIf="assignError" class="text-danger" style="margin: 0 0 0.75rem 0;">{{ assignError }}</p>
+    <p *ngIf="assignError" class="text-danger" style="margin: 0 0 0.75rem 0">{{ assignError }}</p>
     @if (isAdmin()) {
-    <ng-container *ngIf="selectedDevice()">
-
-      @if (!user()){
-      <button class="btn btn-primary" (click)="openAssignModal(); $event.preventDefault()">Assign</button>
-      }@else{
-      <button class="btn btn-secondary" (click)="openUnassignModal(); $event.preventDefault()">Unassign</button>
-      }
-      <button class="btn btn-primary" (click)="openEditModal(); $event.preventDefault()">Edit</button>
-      <button class="btn btn-primary" (click)="openDeleteModal(); $event.preventDefault()">Delete</button>
-
-    </ng-container>
-    <button class="btn btn-primary" (click)="openCreateModal()">Add Device</button>
+      <ng-container *ngIf="selectedDevice()">
+        @if (!user()) {
+          <button class="btn btn-primary" (click)="openAssignModal(); $event.preventDefault()">
+            Assign
+          </button>
+        } @else {
+          <button class="btn btn-secondary" (click)="openUnassignModal(); $event.preventDefault()">
+            Unassign
+          </button>
+        }
+        <button class="btn btn-primary" (click)="openEditModal(); $event.preventDefault()">
+          Edit
+        </button>
+        <button class="btn btn-primary" (click)="openDeleteModal(); $event.preventDefault()">
+          Delete
+        </button>
+      </ng-container>
+      <button class="btn btn-primary" (click)="openCreateModal()">Add Device</button>
     }
     @if (!isAdmin()) {
-    <ng-container *ngIf="selectedDevice()">
-      <button class="btn btn-secondary" (click)="openUnassignModal(); $event.preventDefault()">Unassign</button>
-    </ng-container>
+      <ng-container *ngIf="selectedDevice()">
+        <button class="btn btn-secondary" (click)="openUnassignModal(); $event.preventDefault()">
+          Unassign
+        </button>
+      </ng-container>
 
-    <button class="btn btn-primary" (click)="openAssignModal(); $event.preventDefault()">Assign</button>
+      <button class="btn btn-primary" (click)="openAssignModal(); $event.preventDefault()">
+        Assign
+      </button>
     }
 
     <button class="btn btn-secondary" (click)="cancelled.emit()">Close</button>
@@ -60,16 +71,29 @@
 </div>
 
 <!-- Confirmation Modal -->
-<app-confirm-modal *ngIf="showConfirmModal" [title]="modalTitle" [message]="modalMessage"
-  (closeEvent)="onConfirmModalClose($event)">
+<app-confirm-modal
+  *ngIf="showConfirmModal"
+  [title]="modalTitle"
+  [message]="modalMessage"
+  (closeEvent)="onConfirmModalClose($event)"
+>
 </app-confirm-modal>
 
 <!-- Assign Modal -->
-<app-assign-device-modal *ngIf="showAssignModal" [mode]="assignModalMode" [device]="selectedDevice()" (closeEvent)="onAssignModalClose($event)">
+<app-assign-device-modal
+  *ngIf="showAssignModal"
+  [mode]="assignModalMode"
+  [device]="selectedDevice()"
+  (closeEvent)="onAssignModalClose($event)"
+>
 </app-assign-device-modal>
 
 <app-create-device-modal *ngIf="showCreateModal" (closeEvent)="onCreateModalClose($event)">
 </app-create-device-modal>
 
-<app-edit-device-modal *ngIf="showEditModal" [device]="selectedDevice()" (closeEvent)="onEditModalClose($event)">
+<app-edit-device-modal
+  *ngIf="showEditModal"
+  [device]="selectedDevice()"
+  (closeEvent)="onEditModalClose($event)"
+>
 </app-edit-device-modal>

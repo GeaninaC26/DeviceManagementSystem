@@ -1,5 +1,5 @@
-import { Dto } from "./dto";
-import { RoleEnum } from "./enums/role.enum";
+import { Dto } from './dto';
+import { RoleEnum } from './enums/role.enum';
 
 export class UserDto extends Dto {
   name: string;

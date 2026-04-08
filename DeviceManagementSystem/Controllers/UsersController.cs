@@ -9,7 +9,7 @@ namespace DeviceManagementSystem.Controllers
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.IdentityModel.Tokens;
-
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -24,6 +24,7 @@ namespace DeviceManagementSystem.Controllers
         }
 
         [HttpGet]
+        [Authorize("Admin")]
         public async Task<List<UserDto>> GetAllUsers([FromQuery] string? searchQuery, CancellationToken token)
         {
             return await _userService.GetAllUsersAsync(searchQuery, token);

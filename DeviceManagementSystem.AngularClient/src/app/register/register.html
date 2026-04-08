@@ -5,62 +5,62 @@
     <p class="error-message">{{ errorMessage() }}</p>
   }
 
-<form (submit)="onSubmit($event)">
-  <div>
-    <label>
-      Name:
-      <input type="text" [formField]="registrationForm.name" />
-    </label>
-    @if (registrationForm.name().touched() && registrationForm.name().invalid()) {
-      <ul class="error-list">
-        @for (error of registrationForm.name().errors(); track error) {
-          <li>{{ error.message }}</li>
-        }
-      </ul>
-    }
-  </div>
-  <div>
-    <label>
-      Location:
-      <input type="text" [formField]="registrationForm.location" />
-    </label>
-    @if (registrationForm.location().touched() && registrationForm.location().invalid()) {
-      <ul class="error-list">
-        @for (error of registrationForm.location().errors(); track error) {
-          <li>{{ error.message }}</li>
-        }
-      </ul>
-    }
-  </div>
-  <div>
-    <label>
-      Email:
-      <input type="email" [formField]="registrationForm.email" />
-    </label>
-    @if (registrationForm.email().touched() && registrationForm.email().invalid()) {
-      <ul class="error-list">
-        @for (error of registrationForm.email().errors(); track error) {
-          <li>{{ error.message }}</li>
-        }
-      </ul>
-    }
-  </div>
-  <div>
-    <label>
-      Password:
-      <input type="password" [formField]="registrationForm.password" />
-    </label>
-    @if (registrationForm.password().touched() && registrationForm.password().invalid()) {
-      <ul class="error-list">
-        @for (error of registrationForm.password().errors(); track error) {
-          <li>{{ error.message }}</li>
-        }
-      </ul>
-    }
-  </div>
-  <button type="submit" [disabled]="registrationForm().invalid() || isSubmitting()">
-    {{ isSubmitting() ? 'Creating Account...' : 'Register' }}
-  </button>
-</form>
-<span> Already have an account? <a routerLink="/">Log in</a></span>
+  <form (submit)="onSubmit($event)">
+    <div>
+      <label>
+        Name:
+        <input type="text" [formField]="registrationForm.name" />
+      </label>
+      @if (registrationForm.name().touched() && registrationForm.name().invalid()) {
+        <ul class="error-list">
+          @for (error of registrationForm.name().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
+    </div>
+    <div>
+      <label>
+        Location:
+        <input type="text" [formField]="registrationForm.location" />
+      </label>
+      @if (registrationForm.location().touched() && registrationForm.location().invalid()) {
+        <ul class="error-list">
+          @for (error of registrationForm.location().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
+    </div>
+    <div>
+      <label>
+        Email:
+        <input type="email" [formField]="registrationForm.email" />
+      </label>
+      @if (registrationForm.email().touched() && registrationForm.email().invalid()) {
+        <ul class="error-list">
+          @for (error of registrationForm.email().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
+    </div>
+    <div>
+      <label>
+        Password:
+        <input type="password" [formField]="registrationForm.password" />
+      </label>
+      @if (registrationForm.password().touched() && registrationForm.password().invalid()) {
+        <ul class="error-list">
+          @for (error of registrationForm.password().errors(); track error) {
+            <li>{{ error.message }}</li>
+          }
+        </ul>
+      }
+    </div>
+    <button type="submit" [disabled]="registrationForm().invalid() || isSubmitting()">
+      {{ isSubmitting() ? 'Creating Account...' : 'Register' }}
+    </button>
+  </form>
+  <span> Already have an account? <a routerLink="/">Log in</a></span>
 </div>
