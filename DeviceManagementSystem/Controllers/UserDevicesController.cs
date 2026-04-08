@@ -19,7 +19,6 @@ namespace DeviceManagementSystem.Controllers
         }
 
         [HttpGet]
-        [Authorize("Admin")]
         public async Task<List<UserDeviceDto>> GetAllUserDevices(CancellationToken token)
         {
             return await _userDeviceService.GetAllAsync(token);

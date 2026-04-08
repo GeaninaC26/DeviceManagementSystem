@@ -33,6 +33,18 @@ function sanitizeServerText(text: string): string {
   return firstLine;
 }
 
+function isHighDemandError(text: string): boolean {
+  const lowerText = text.toLowerCase();
+  return (
+    lowerText.includes('high demand') ||
+    lowerText.includes('temporarily unavailable') ||
+    lowerText.includes('service unavailable') ||
+    lowerText.includes('currently overloaded') ||
+    lowerText.includes('rate limit') ||
+    lowerText.includes('quota exceeded')
+  );
+}
+
 export function extractApiErrorMessage(
   error: unknown,
   fallback = 'Something went wrong. Please try again.',
@@ -46,6 +58,9 @@ export function extractApiErrorMessage(
   }
 
   if (error instanceof Error && error.message.trim().length > 0) {
+    if (isHighDemandError(error.message)) {
+      return 'The AI service is currently experiencing high demand. Please try again in a few moments.';
+    }
     return error.message;
   }
 
@@ -62,6 +77,9 @@ export function extractApiErrorMessage(
 
     if (typeof payload === 'string' && payload.trim().length > 0) {
       const sanitized = sanitizeServerText(payload);
+      if (isHighDemandError(sanitized)) {
+        return 'The AI service is currently experiencing high demand. Please try again in a few moments.';
+      }
       if (sanitized.toLowerCase().includes('access denied')) {
         return 'Access denied. You do not have permission to perform this action.';
       }
@@ -70,6 +88,9 @@ export function extractApiErrorMessage(
 
     if (payload && typeof payload === 'object') {
       if (payload.message && payload.message.trim().length > 0) {
+        if (isHighDemandError(payload.message)) {
+          return 'The AI service is currently experiencing high demand. Please try again in a few moments.';
+        }
         if (payload.message.toLowerCase().includes('access denied')) {
           return 'Access denied. You do not have permission to perform this action.';
         }
@@ -77,6 +98,9 @@ export function extractApiErrorMessage(
       }
 
       if (payload.detail && payload.detail.trim().length > 0) {
+        if (isHighDemandError(payload.detail)) {
+          return 'The AI service is currently experiencing high demand. Please try again in a few moments.';
+        }
         if (payload.detail.toLowerCase().includes('access denied')) {
           return 'Access denied. You do not have permission to perform this action.';
         }
@@ -84,6 +108,9 @@ export function extractApiErrorMessage(
       }
 
       if (payload.title && payload.title.trim().length > 0) {
+        if (isHighDemandError(payload.title)) {
+          return 'The AI service is currently experiencing high demand. Please try again in a few moments.';
+        }
         if (payload.title.toLowerCase().includes('access denied')) {
           return 'Access denied. You do not have permission to perform this action.';
         }
@@ -112,6 +139,9 @@ export function extractApiErrorMessage(
     }
 
     if (typeof error.message === 'string' && error.message.trim().length > 0) {
+      if (isHighDemandError(error.message)) {
+        return 'The AI service is currently experiencing high demand. Please try again in a few moments.';
+      }
       return error.message;
     }
   }
