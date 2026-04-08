@@ -1,107 +1,61 @@
-
----------------------------------------------------------
--- 2. POPULATE USERS 
----------------------------------------------------------
-
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Name = 'Meredith Grey')
-BEGIN
-    INSERT INTO Users (Name, Role, Location)
-    VALUES ('Meredith Grey', 'User', 'Seattle');
-END
-
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Name = 'Derek Shepherd')
-BEGIN
-    INSERT INTO Users (Name, Role, Location)
-    VALUES ('Derek Shepherd', 'User', 'Seattle');
-END
-
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Name = 'Cristina Yang')
-BEGIN
-    INSERT INTO Users (Name, Role, Location)
-    VALUES ('Cristina Yang', 'User', 'Switzerland');
-END
-
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Name = 'Miranda Bailey')
-BEGIN
-    INSERT INTO Users (Name, Role, Location)
-    VALUES ('Miranda Bailey', 'User', 'Seattle');
-END
-
-
----------------------------------------------------------
--- 2. POPULATE DEVICES (Medical Grade Tech)
----------------------------------------------------------
-IF NOT EXISTS (SELECT 1 FROM Devices WHERE Name = 'iPhone 17 Pro')
-    INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description)
-    VALUES ('iPhone 17 Pro', 'Apple', 'phone', 'iOS', '19.0', 'A19 Pro', '12GB', 'Latest apple smartphone');
-
-IF NOT EXISTS (SELECT 1 FROM Devices WHERE Name = 'Samsung Galaxy S24')
-    INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description)
-    VALUES ('Samsung Galaxy S24', 'Samsung', 'phone', 'Android', '14.0', 'Snapdragon 8 Gen 3', '8GB', 'Standard issue Android device');
-
-IF NOT EXISTS (SELECT 1 FROM Devices WHERE Name = 'MacBook Pro M3')
-    INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description)
-    VALUES ('MacBook Pro M3', 'Apple', 'laptop', 'macOS', 'Sonoma', 'M3 Max', '32GB', 'High-end workstation for imaging');
-
-IF NOT EXISTS (SELECT 1 FROM Devices WHERE Name = 'Dell XPS 15')
-    INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description)
-    VALUES ('Dell XPS 15', 'Dell', 'laptop', 'Windows', '11', 'Intel i9', '16GB', 'Standard administrative laptop');
-
-IF NOT EXISTS (SELECT 1 FROM Devices WHERE Name = 'iPad Pro 12.9')
-    INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description)
-    VALUES ('iPad Pro 12.9', 'Apple', 'tablet', 'iPadOS', '17.5', 'M2', '8GB', 'Tablet for digital charts');
-
----------------------------------------------------------
--- 3. POPULATE USER-DEVICE MAPPINGS
----------------------------------------------------------
-IF NOT EXISTS (SELECT 1 FROM UserDevices WHERE UserId = (SELECT Id FROM Users WHERE Name = 'Meredith Grey') AND DeviceId = (SELECT Id FROM Devices WHERE Name = 'MacBook Pro M3'))
-    INSERT INTO UserDevices (UserId, DeviceId) VALUES ((SELECT Id FROM Users WHERE Name = 'Meredith Grey'), (SELECT Id FROM Devices WHERE Name = 'MacBook Pro M3'));
-
-IF NOT EXISTS (SELECT 1 FROM UserDevices WHERE UserId = (SELECT Id FROM Users WHERE Name = 'Derek Shepherd') AND DeviceId = (SELECT Id FROM Devices WHERE Name = 'iPhone 17 Pro'))
-    INSERT INTO UserDevices (UserId, DeviceId) VALUES ((SELECT Id FROM Users WHERE Name = 'Derek Shepherd'), (SELECT Id FROM Devices WHERE Name = 'iPhone 17 Pro'));
-
-IF NOT EXISTS (SELECT 1 FROM UserDevices WHERE UserId = (SELECT Id FROM Users WHERE Name = 'Cristina Yang') AND DeviceId = (SELECT Id FROM Devices WHERE Name = 'Dell XPS 15'))
-    INSERT INTO UserDevices (UserId, DeviceId) VALUES ((SELECT Id FROM Users WHERE Name = 'Cristina Yang'), (SELECT Id FROM Devices WHERE Name = 'Dell XPS 15'));
-
-IF NOT EXISTS (SELECT 1 FROM UserDevices WHERE UserId = (SELECT Id FROM Users WHERE Name = 'Miranda Bailey') AND DeviceId = (SELECT Id FROM Devices WHERE Name = 'iPad Pro 12.9'))
-    INSERT INTO UserDevices (UserId, DeviceId) VALUES ((SELECT Id FROM Users WHERE Name = 'Miranda Bailey'), (SELECT Id FROM Devices WHERE Name = 'iPad Pro 12.9'));
-
+USE DeviceManagementDB;
 GO
 
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'meredith.grey@greysloan.com')
-BEGIN
-    INSERT INTO Users (Name, Email, Role, Location, PasswordHash)
-    VALUES ('admin', 'admin@email.com', 'Admin', 'loc', 'admin');
-END
+WITH NewUsers (Name, Email, Role, Location) AS (
+    SELECT 'Meredith Grey', 'm.grey@grey-sloan.com', 'Admin', 'Seattle' UNION ALL
+    SELECT 'Derek Shepherd', 'd.shepherd@grey-sloan.com', 'User', 'Seattle' UNION ALL
+    SELECT 'Cristina Yang', 'c.yang@grey-sloan.com', 'User', 'Switzerland' UNION ALL
+    SELECT 'Alex Karev', 'a.karev@grey-sloan.com', 'User', 'Kansas' UNION ALL
+    SELECT 'Miranda Bailey', 'm.bailey@grey-sloan.com', 'Admin', 'Seattle' UNION ALL
+    SELECT 'Richard Webber', 'r.webber@grey-sloan.com', 'Admin', 'Seattle' UNION ALL
+    SELECT 'Callie Torres', 'c.torres@grey-sloan.com', 'User', 'New York' UNION ALL
+    SELECT 'Arizona Robbins', 'a.robbins@grey-sloan.com', 'User', 'New York' UNION ALL
+    SELECT 'Jackson Avery', 'j.avery@grey-sloan.com', 'User', 'Boston' UNION ALL
+    SELECT 'April Kepner', 'a.kepner@grey-sloan.com', 'User', 'Seattle'
+)
+INSERT INTO Users (Name, Email, Role, Location, PasswordHash)
+SELECT nu.Name, nu.Email, nu.Role, nu.Location, 'hashed_default_password'
+FROM NewUsers nu
+WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Users.Email = nu.Email);
 
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'derek.shepherd@greysloan.com')
-BEGIN
-    INSERT INTO Users (Name, Email, Role, Location, PasswordHash)
-    VALUES ('Derek Shepherd', 'derek.shepherd@greysloan.com', 'User', 'Seattle', 'password123');
-END
+WITH NewDevices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description, SerialNumber) AS (
+    SELECT 'MacBook Air M3', 'Apple', 'Laptop', 'macOS', 'Sonoma', 'M3', '16GB', 'Ultra-thin laptop', 'MB-AIR-M3-001' UNION ALL
+    SELECT 'ThinkPad X1 Carbon', 'Lenovo', 'Laptop', 'Windows', '11 Pro', 'Intel i7', '32GB', 'Business flagship', 'TP-X1-CARBON-001' UNION ALL
+    SELECT 'Surface Laptop 5', 'Microsoft', 'Laptop', 'Windows', '11', 'Intel i5', '8GB', 'Touchscreen laptop', 'SURFACE-LAPTOP-5-001' UNION ALL
+    SELECT 'Dell XPS 13', 'Dell', 'Laptop', 'Windows', '11', 'Intel i7', '16GB', 'InfinityEdge display', 'DELL-XPS-13-001' UNION ALL
+    SELECT 'HP Spectre x360', 'HP', 'Laptop', 'Windows', '11', 'Intel i7', '16GB', '2-in-1 convertible', 'HP-SPECTRE-X360-001' UNION ALL
+    SELECT 'iPad Pro 12.9', 'Apple', 'Tablet', 'iPadOS', '17', 'M2', '8GB', 'High-end tablet', 'IPAD-PRO-12.9-001' UNION ALL
+    SELECT 'Galaxy Tab S9', 'Samsung', 'Tablet', 'Android', '14', 'Snapdragon G2', '12GB', 'AMOLED tablet', 'GALAXY-TAB-S9-001' UNION ALL
+    SELECT 'Surface Pro 9', 'Microsoft', 'Tablet', 'Windows', '11', 'Intel i5', '16GB', 'Tablet that replaces laptop', 'SURFACE-PRO-9-001' UNION ALL
+    SELECT 'iPhone 15 Pro', 'Apple', 'Phone', 'iOS', '17', 'A17 Pro', '8GB', 'Titanium build', 'IPHONE-15-PRO-001' UNION ALL
+    SELECT 'Galaxy S24 Ultra', 'Samsung', 'Phone', 'Android', '14', 'Snapdragon G3', '12GB', 'AI integrated phone', 'GALAXY-S24-ULTRA-001' UNION ALL
+    SELECT 'Pixel 8 Pro', 'Google', 'Phone', 'Android', '14', 'Tensor G3', '12GB', 'Pure Android experience', 'PIXEL-8-PRO-001' UNION ALL
+    SELECT 'iPhone SE', 'Apple', 'Phone', 'iOS', '16', 'A15', '4GB', 'Budget company phone', 'IPHONE-SE-001' UNION ALL
+    SELECT 'Apple Watch Series 9', 'Apple', 'Watch', 'watchOS', '10', 'S9', '1GB', 'Health tracking', 'APPLE-WATCH-SERIES-9-001' UNION ALL
+    SELECT 'Galaxy Watch 6', 'Samsung', 'Watch', 'WearOS', '4', 'Exynos W930', '2GB', 'Round smartwatch', 'GALAXY-WATCH-6-001' UNION ALL
+    SELECT 'Pixel Watch 2', 'Google', 'Watch', 'WearOS', '4', 'SW5100', '2GB', 'Fitbit integration', 'PIXEL-WATCH-2-001'
+)
+INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description, SerialNumber)
+SELECT nd.Name, nd.Manufacturer, nd.Type, nd.OS, nd.OSVersion, nd.Processor, nd.RAM, nd.Description, nd.SerialNumber
+FROM NewDevices nd
+WHERE NOT EXISTS (SELECT 1 FROM Devices WHERE Devices.Name = nd.Name);
 
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'cristina.yang@greysloan.com')
-BEGIN
-    INSERT INTO Users (Name, Email, Role, Location, PasswordHash)
-    VALUES ('Cristina Yang', 'cristina.yang@greysloan.com', 'User', 'Switzerland', 'password123');
-END
+/* --- 3. MOCK ASSIGNMENTS (UserDevices) --- */
+-- Meredith gets her MacBook
+INSERT INTO UserDevices (UserId, DeviceId)
+SELECT u.Id, d.Id FROM Users u, Devices d 
+WHERE u.Email = 'm.grey@grey-sloan.com' AND d.Name = 'MacBook Air M3'
+AND NOT EXISTS (SELECT 1 FROM UserDevices ud WHERE ud.UserId = u.Id AND ud.DeviceId = d.Id);
 
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'miranda.bailey@greysloan.com')
-BEGIN
-    INSERT INTO Users (Name, Email, Role, Location, PasswordHash)
-    VALUES ('Miranda Bailey', 'miranda.bailey@greysloan.com', 'User', 'Seattle', 'password123');
-END
+-- Cristina gets her high-end ThinkPad
+INSERT INTO UserDevices (UserId, DeviceId)
+SELECT u.Id, d.Id FROM Users u, Devices d 
+WHERE u.Email = 'c.yang@grey-sloan.com' AND d.Name = 'ThinkPad X1 Carbon'
+AND NOT EXISTS (SELECT 1 FROM UserDevices ud WHERE ud.UserId = u.Id AND ud.DeviceId = d.Id);
 
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'george.omalley@greysloan.com')
-BEGIN
-    INSERT INTO Users (Name, Email, Role, Location, PasswordHash)
-    VALUES ('George O''Malley', 'george.omalley@greysloan.com', 'User', 'Seattle', 'password123');
-END
-
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Email = 'izzie.stevens@greysloan.com')
-BEGIN
-    INSERT INTO Users (Name, Email, Role, Location, PasswordHash)
-    VALUES ('Izzie Stevens', 'izzie.stevens@greysloan.com', 'User', 'Seattle', 'password123');
-END
-
+-- Derek gets an iPhone
+INSERT INTO UserDevices (UserId, DeviceId)
+SELECT u.Id, d.Id FROM Users u, Devices d 
+WHERE u.Email = 'd.shepherd@grey-sloan.com' AND d.Name = 'iPhone 15 Pro'
+AND NOT EXISTS (SELECT 1 FROM UserDevices ud WHERE ud.UserId = u.Id AND ud.DeviceId = d.Id);
 GO

@@ -41,6 +41,17 @@
             "
           >
             <div style="display: flex; flex-direction: column; gap: 0.25rem">
+              <label> Serial Number: </label>
+              <input class="form-control" type="text" [formField]="createForm.serialNumber" />
+              @if (createForm.serialNumber().touched() && createForm.serialNumber().invalid()) {
+                <ul class="error-list">
+                  @for (error of createForm.serialNumber().errors(); track error) {
+                    <li>{{ error.message }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.25rem">
               <label> Device Name: </label>
               <input class="form-control" type="text" [formField]="createForm.name" />
               @if (createForm.name().touched() && createForm.name().invalid()) {

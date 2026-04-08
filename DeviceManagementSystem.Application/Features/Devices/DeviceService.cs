@@ -57,11 +57,9 @@ namespace DeviceManagementSystem.Application.Features.Devices
 
         public async Task UpsertDeviceAsync(UpsertDeviceCommand command, CancellationToken token)
         {
-            // Validate command
             if (command == null)
                 throw new ArgumentNullException(nameof(command), "Device data cannot be null");
 
-            // Validate required fields
             if (string.IsNullOrWhiteSpace(command.Name))
                 throw new ArgumentException("Device name is required", nameof(command.Name));
 
@@ -86,9 +84,9 @@ namespace DeviceManagementSystem.Application.Features.Devices
             Device device;
             if (command.Id > 0)
             {
-                // Update existing device
                 device = new Device(
                     command.Id,
+                    command.SerialNumber,
                     command.Name,
                     command.Manufacturer,
                     command.Type,
@@ -101,8 +99,15 @@ namespace DeviceManagementSystem.Application.Features.Devices
             }
             else
             {
-                // Create new device
+                if (!string.IsNullOrWhiteSpace(command.SerialNumber))
+                {
+                    var existingDevice = await _deviceRepository.GetBySerialNumberAsync(command.SerialNumber, token);
+                    if (existingDevice != null)
+                        throw new InvalidOperationException($"A device with this serial number already exists. Please register a unique device number.");
+                }
+
                 device = new Device(
+                    command.SerialNumber,
                     command.Name,
                     command.Manufacturer,
                     command.Type,

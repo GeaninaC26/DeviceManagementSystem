@@ -2,6 +2,7 @@ namespace DeviceManagementSystem.Application.Contracts
 {
     public class DeviceDto : Dto<int>
     {
+        public string SerialNumber { get; set; }
         public string Name { get; set; }
         public string Manufacturer { get; set; }
         public string Type { get; set; }

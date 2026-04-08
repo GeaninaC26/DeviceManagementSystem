@@ -1,6 +1,7 @@
 import { Dto } from './dto';
 
 export class DeviceDto extends Dto {
+  serialNumber: string;
   name: string;
   manufacturer: string;
   type: string;

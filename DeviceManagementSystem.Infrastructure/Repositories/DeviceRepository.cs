@@ -19,8 +19,31 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description FROM Devices WHERE Id = @Id";
+                command.CommandText = "SELECT Id, SerialNumber, Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description FROM Devices WHERE Id = @Id";
                 command.Parameters.AddWithValue("@Id", id);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        return MapReaderToDevice(reader);
+                    }
+                }
+            }
+            return null;
+        }
+
+        public async Task<Device> GetBySerialNumberAsync(string serialNumber, CancellationToken token)
+        {
+            if (string.IsNullOrWhiteSpace(serialNumber))
+                return null;
+
+            using (var connection = _databaseProvider.GetConnection(token))
+            {
+                await connection.OpenAsync();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id, SerialNumber, Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description FROM Devices WHERE SerialNumber = @SerialNumber";
+                command.Parameters.AddWithValue("@SerialNumber", serialNumber.Trim());
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -41,7 +64,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description FROM Devices";
+                command.CommandText = "SELECT Id, SerialNumber, Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description FROM Devices";
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -79,8 +102,8 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                     END
                     ELSE
                     BEGIN
-                        INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description)
-                        VALUES (@Name, @Manufacturer, @Type, @OS, @OSVersion, @Processor, @RAM, @Description)
+                        INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description, SerialNumber)
+                        VALUES (@Name, @Manufacturer, @Type, @OS, @OSVersion, @Processor, @RAM, @Description, @SerialNumber)
                     END";
 
                 command.Parameters.AddWithValue("@Id", entity.Id);
@@ -92,7 +115,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                 command.Parameters.AddWithValue("@Processor", entity.Processor);
                 command.Parameters.AddWithValue("@RAM", entity.RAM);
                 command.Parameters.AddWithValue("@Description", entity.Description);
-
+                command.Parameters.AddWithValue("@SerialNumber", entity.SerialNumber);
                 await command.ExecuteNonQueryAsync();
             }
         }
@@ -118,7 +141,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    SELECT d.Id, d.Name, d.Manufacturer, d.Type, d.OS, d.OSVersion, d.Processor, d.RAM, d.Description
+                    SELECT d.Id, d.SerialNumber, d.Name, d.Manufacturer, d.Type, d.OS, d.OSVersion, d.Processor, d.RAM, d.Description
                     FROM Devices d
                     LEFT JOIN UserDevices ud ON d.Id = ud.DeviceId
                     WHERE ud.UserId IS NULL";
@@ -143,7 +166,7 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    SELECT d.Id, d.Name, d.Manufacturer, d.Type, d.OS, d.OSVersion, d.Processor, d.RAM, d.Description
+                    SELECT d.Id, d.SerialNumber, d.Name, d.Manufacturer, d.Type, d.OS, d.OSVersion, d.Processor, d.RAM, d.Description
                     FROM Devices d
                     INNER JOIN UserDevices ud ON d.Id = ud.DeviceId
                     WHERE ud.UserId = @UserId";
@@ -172,8 +195,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             var processor = reader["Processor"].ToString();
             var ram = reader["RAM"].ToString();
             var description = reader["Description"].ToString();
+            var serialNumber = reader["SerialNumber"].ToString();
 
-            return new Device(id, name, manufacturer, deviceType, os, osVersion, processor, ram, description);
+            return new Device(id, name, manufacturer, deviceType, os, osVersion, processor, ram, description, serialNumber);
         }
 
     }

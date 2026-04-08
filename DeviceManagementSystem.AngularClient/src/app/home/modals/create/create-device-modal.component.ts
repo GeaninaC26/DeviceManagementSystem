@@ -12,6 +12,7 @@ import { extractApiErrorMessage } from '../../../../services/api-error.util';
 import { GenerateDeviceDescriptionCommand } from '../../../../contracts/commands/description-generation.command';
 
 interface CreateDeviceModel {
+  serialNumber: string;
   name: string;
   manufacturer: string;
   type: string;
@@ -41,6 +42,7 @@ export class CreateDeviceModalComponent extends ModalComponent implements OnInit
   }
 
   createModel = signal<CreateDeviceModel>({
+    serialNumber: '',
     name: '',
     manufacturer: '',
     type: '',
@@ -52,6 +54,7 @@ export class CreateDeviceModalComponent extends ModalComponent implements OnInit
   });
 
   createForm = form(this.createModel, (schemaPath) => {
+    required(schemaPath.serialNumber, { message: 'Serial number is required' });
     required(schemaPath.name, { message: 'Device name is required' });
     required(schemaPath.manufacturer, { message: 'Manufacturer is required' });
     required(schemaPath.type, { message: 'Device type is required' });
@@ -68,6 +71,7 @@ export class CreateDeviceModalComponent extends ModalComponent implements OnInit
     const model = this.createModel();
 
     if (
+      !model.serialNumber ||
       !model.name ||
       !model.manufacturer ||
       !model.type ||

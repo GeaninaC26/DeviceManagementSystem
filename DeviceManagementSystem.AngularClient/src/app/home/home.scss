@@ -1,6 +1,6 @@
 .device-management {
   --top-navbar-height: 6.5em;
-  padding: 2rem;
+  padding: 2rem 1rem ;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -47,9 +47,8 @@ app-device-management {
   flex-direction: column;
 }
 
-.device-search{
+.device-search {
   margin-bottom: 2rem;
-
 }
 
 .device-search-input {
@@ -60,11 +59,12 @@ app-device-management {
   padding: 8px 20px;
   font-size: 1rem;
   background: var(--bg-white);
-}
-.device-search-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  }
 }
 
 .device-list {
@@ -100,17 +100,17 @@ app-device-management {
   background-color: var(--bg-white);
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s;
-}
 
-.device-item:hover {
-  background-color: var(--primary-light);
-  border-color: var(--primary-color);
-}
+  &:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+  }
 
-.device-item.selected {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: var(--bg-white);
+  &.selected {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--bg-white);
+  }
 }
 
 .device-name {

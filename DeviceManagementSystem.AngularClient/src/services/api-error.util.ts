@@ -13,8 +13,6 @@ function sanitizeServerText(text: string): string {
     return '';
   }
 
-  // ASP.NET developer exception pages often include stack traces and headers.
-  // Keep only the first meaningful line and strip exception type prefixes.
   const firstLine = trimmed.split(/\r?\n/)[0]?.trim() ?? '';
   if (firstLine.length === 0) {
     return '';
@@ -56,23 +54,39 @@ export function extractApiErrorMessage(
       return 'Cannot reach the server. Please check your connection.';
     }
 
+    if (error.status === 403) {
+      return 'Access denied. You do not have permission to perform this action.';
+    }
+
     const payload = error.error as ValidationErrorPayload | string | null;
 
     if (typeof payload === 'string' && payload.trim().length > 0) {
       const sanitized = sanitizeServerText(payload);
+      if (sanitized.toLowerCase().includes('access denied')) {
+        return 'Access denied. You do not have permission to perform this action.';
+      }
       return sanitized.length > 0 ? sanitized : fallback;
     }
 
     if (payload && typeof payload === 'object') {
       if (payload.message && payload.message.trim().length > 0) {
+        if (payload.message.toLowerCase().includes('access denied')) {
+          return 'Access denied. You do not have permission to perform this action.';
+        }
         return payload.message;
       }
 
       if (payload.detail && payload.detail.trim().length > 0) {
+        if (payload.detail.toLowerCase().includes('access denied')) {
+          return 'Access denied. You do not have permission to perform this action.';
+        }
         return payload.detail;
       }
 
       if (payload.title && payload.title.trim().length > 0) {
+        if (payload.title.toLowerCase().includes('access denied')) {
+          return 'Access denied. You do not have permission to perform this action.';
+        }
         return payload.title;
       }
 

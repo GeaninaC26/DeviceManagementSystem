@@ -5,6 +5,7 @@ namespace DeviceManagementSystem.Domain.Entities
 {
     public class Device : Entity<int>
     {
+        public string SerialNumber { get; private set; }
         public string Name { get; private set; }
         public string Manufacturer { get; private set; }
         public string Type { get; private set; }
@@ -15,7 +16,7 @@ namespace DeviceManagementSystem.Domain.Entities
         public string Description { get; private set; }
 
         private Device() { }
-        public Device(string name, string manufacturer, string type, string os, string osVersion, string processor, string ram, string description)
+        public Device(string name, string manufacturer, string type, string os, string osVersion, string processor, string ram, string description, string serialNumber)
         {
             ValidateInput(name, manufacturer, type, os, osVersion, processor, ram, description);
             Name = name;
@@ -26,10 +27,10 @@ namespace DeviceManagementSystem.Domain.Entities
             Processor = processor;
             RAM = ram;
             Description = description;
+            SerialNumber = serialNumber;
         }
 
-        // Constructor for loading from database
-        public Device(int id, string name, string manufacturer, string type, string os, string osVersion, string processor, string ram, string description) : base(id)
+        public Device(int id, string name, string manufacturer, string type, string os, string osVersion, string processor, string ram, string description, string serialNumber) : base(id)
         {
             ValidateInput(name, manufacturer, type, os, osVersion, processor, ram, description);
             Name = name;
@@ -40,6 +41,7 @@ namespace DeviceManagementSystem.Domain.Entities
             Processor = processor;
             RAM = ram;
             Description = description;
+            SerialNumber = serialNumber;
         }
 
         private void ValidateInput(string name, string manufacturer, string type, string os, string osVersion, string processor, string ram, string description)

@@ -18,7 +18,8 @@
 }
 
 .card-body {
- overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .device-details{
@@ -31,8 +32,8 @@
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
-}
 
-.device-item p {
-  margin: 0.2rem 0;
+  p {
+    margin: 0.2rem 0;
+  }
 }
