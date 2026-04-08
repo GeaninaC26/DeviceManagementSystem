@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, input, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DeviceDto } from '../../../../contracts/device.dto';
 import { UserDto } from '../../../../contracts/user.dto';
@@ -15,11 +15,16 @@ import { ModalOpts } from '../../../components/modal/modal-opts';
   templateUrl: './assign-device-modal.component.html',
   styleUrls: ['../../../components/modal/modal.component.scss'],
 })
-export class AssignDeviceModalComponent extends ModalComponent implements OnInit {
+export class AssignDeviceModalComponent extends ModalComponent implements OnInit, OnDestroy {
   mode = input<'admin' | 'user'>('admin');
   device = input<DeviceDto | null>(null);
   users = signal<UserDto[]>([]);
   devices = signal<DeviceDto[]>([]);
+  userSearchQuery = signal<string>('');
+  deviceSearchQuery = signal<string>('');
+
+  private userSearchTimeout: any;
+  private deviceSearchTimeout: any;
 
   selectedUserId = signal<number | null>(null);
   selectedDeviceId = signal<number | null>(null);
@@ -57,7 +62,6 @@ export class AssignDeviceModalComponent extends ModalComponent implements OnInit
       await this.loadUsers();
       return;
     }
-
     await this.loadUnassignedDevices();
   }
 
@@ -65,7 +69,7 @@ export class AssignDeviceModalComponent extends ModalComponent implements OnInit
     try {
       this.isLoading.set(true);
       this.error.set(null);
-      this.users.set(await this.userService.getUsers());
+      this.users.set(await this.userService.getUsers(this.userSearchQuery()));
     } catch (error) {
       console.error('Error fetching users:', error);
       this.error.set(extractApiErrorMessage(error, 'Failed to fetch users.'));
@@ -78,13 +82,27 @@ export class AssignDeviceModalComponent extends ModalComponent implements OnInit
     try {
       this.isLoading.set(true);
       this.error.set(null);
-      this.devices.set(await this.deviceService.getUnassignedDevices());
+      this.devices.set(await this.deviceService.getUnassignedDevices(this.deviceSearchQuery()));
     } catch (error) {
       console.error('Error fetching unassigned devices:', error);
       this.error.set(extractApiErrorMessage(error, 'Failed to fetch unassigned devices.'));
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  onUserSearchChange() {
+    if (this.userSearchTimeout) clearTimeout(this.userSearchTimeout);
+    this.userSearchTimeout = setTimeout(async () => {
+      await this.loadUsers();
+    }, 300); // 300ms debounce for smoother UX
+  }
+
+  onDeviceSearchChange() {
+    if (this.deviceSearchTimeout) clearTimeout(this.deviceSearchTimeout);
+    this.deviceSearchTimeout = setTimeout(async () => {
+      await this.loadUnassignedDevices();
+    }, 300); // 300ms debounce for smoother UX
   }
 
   selectUser(userId: number) {
@@ -111,11 +129,23 @@ export class AssignDeviceModalComponent extends ModalComponent implements OnInit
       this.error.set('Please select a device.');
       return;
     }
-
     this.closeResolved(selectedDevice);
   }
 
   cancelAssign() {
     this.closeResolved(false);
+  }
+
+  trackByUserId(index: number, user: UserDto): number {
+    return user.id;
+  }
+
+  trackByDeviceId(index: number, device: DeviceDto): number {
+    return device.id;
+  }
+
+  override ngOnDestroy() {
+    if (this.userSearchTimeout) clearTimeout(this.userSearchTimeout);
+    if (this.deviceSearchTimeout) clearTimeout(this.deviceSearchTimeout);
   }
 }

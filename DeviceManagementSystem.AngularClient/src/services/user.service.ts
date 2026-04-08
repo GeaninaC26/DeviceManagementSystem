@@ -11,8 +11,9 @@ export class UserService {
 
   constructor(private http: HttpService) {}
 
-  async getUsers(): Promise<UserDto[]> {
-    return this.http.get(this.url);
+  async getUsers(searchQuery?: string): Promise<UserDto[]> {
+    const url = searchQuery ? `${this.url}?searchQuery=${encodeURIComponent(searchQuery)}` : this.url;
+    return this.http.get(url);
   }
 
   async getUser(id: number): Promise<UserDto> {

@@ -14,9 +14,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             _databaseProvider = databaseProvider;
         }
 
-        public async Task<UserDevice> GetByIdAsync(int id)
+        public async Task<UserDevice> GetByIdAsync(int id, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -34,10 +34,10 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             throw new Exception($"User-Device association with ID {id} not found");
         }
 
-        public async Task<IEnumerable<UserDevice>> GetAllAsync()
+        public async Task<IEnumerable<UserDevice>> GetAllAsync(CancellationToken token)
         {
             var userDevices = new List<UserDevice>();
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -54,10 +54,10 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return userDevices;
         }
 
-        public async Task<IEnumerable<UserDevice>> GetByUserIdAsync(int userId)
+        public async Task<IEnumerable<UserDevice>> GetByUserIdAsync(int userId, CancellationToken token)
         {
             var userDevices = new List<UserDevice>();
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -75,9 +75,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return userDevices;
         }
 
-        public async Task UpsertAsync(UserDevice entity)
+        public async Task UpsertAsync(UserDevice entity, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -96,9 +96,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
 
     
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();

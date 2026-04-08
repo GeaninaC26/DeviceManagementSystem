@@ -24,34 +24,34 @@ namespace DeviceManagementSystem.Controllers
         }
 
         [HttpGet]
-        public async Task<List<UserDto>> GetAllUsers(CancellationToken token)
+        public async Task<List<UserDto>> GetAllUsers([FromQuery] string? searchQuery, CancellationToken token)
         {
-            return await _userService.GetAllUsersAsync();
+            return await _userService.GetAllUsersAsync(searchQuery, token);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUserById(int id, CancellationToken token)
         {
-            var user = await _userService.GetUserByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(id, token);
             if (user == null) return NotFound();
             return Ok(user);
         }
 
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id, CancellationToken token)
         {
-            await _userService.DeleteUserAsync(id);
+            await _userService.DeleteUserAsync(id, token);
             return Ok();
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> UpsertUser([FromBody] UpsertUserCommand userCommand)
+        public async Task<IActionResult> UpsertUser([FromBody] UpsertUserCommand userCommand, CancellationToken token)
         {
             try
             {
-                await _userService.UpsertUserAsync(userCommand);
+                await _userService.UpsertUserAsync(userCommand, token);
                 return Ok();
             }
             catch (ArgumentException ex)
@@ -75,7 +75,7 @@ namespace DeviceManagementSystem.Controllers
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var user = await _userService.AuthenticateAsync(command.Email, command.Password);
+                var user = await _userService.AuthenticateAsync(command.Email, command.Password, cancellationToken);
                 var jwtToken = GenerateJwtToken(user);
 
                 return Ok(new AuthResponseDto
@@ -114,7 +114,7 @@ namespace DeviceManagementSystem.Controllers
                     return Unauthorized(new { message = "Invalid authentication token." });
                 }
 
-                var user = await _userService.GetUserByIdAsync(userId);
+                var user = await _userService.GetUserByIdAsync(userId, token);
                 return Ok(user);
             }
             catch (ArgumentException ex)

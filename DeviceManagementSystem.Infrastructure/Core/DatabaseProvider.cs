@@ -12,7 +12,7 @@ namespace DeviceManagementSystem.Infrastructure.Data
             _connectionString = connectionString;
         }
 
-        public SqlConnection GetConnection()
+        public SqlConnection GetConnection(CancellationToken token)
         {
             return new SqlConnection(_connectionString);
         }

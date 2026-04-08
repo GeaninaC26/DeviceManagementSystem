@@ -20,7 +20,7 @@ namespace DeviceManagementSystem.Application.Features.UserDevices
             if (id <= 0)
                 throw new ArgumentException("User-Device association ID must be greater than 0", nameof(id));
 
-            var userDevice = await _userDeviceRepository.GetByIdAsync(id);
+            var userDevice = await _userDeviceRepository.GetByIdAsync(id, token);
 
             // Check if association exists
             if (userDevice == null)
@@ -31,11 +31,11 @@ namespace DeviceManagementSystem.Application.Features.UserDevices
 
         public async Task<List<UserDeviceDto>> GetAllAsync(CancellationToken token)
         {
-            var userDevices = await _userDeviceRepository.GetAllAsync();
+            var userDevices = await _userDeviceRepository.GetAllAsync(token);
             return (await _mapper.PrepareItemsAsync(userDevices, token)).ToList();
         }
 
-        public async Task AssignDeviceToUserAsync(int userId, int deviceId)
+        public async Task AssignDeviceToUserAsync(int userId, int deviceId, CancellationToken token)
         {
             // Validate IDs
             if (userId <= 0)
@@ -45,22 +45,22 @@ namespace DeviceManagementSystem.Application.Features.UserDevices
                 throw new ArgumentException("Device ID must be greater than 0", nameof(deviceId));
 
             var userDevice = new UserDevice(userId, deviceId);
-            await _userDeviceRepository.UpsertAsync(userDevice);
+            await _userDeviceRepository.UpsertAsync(userDevice, token);
         }
 
-        public async Task UnassignDeviceFromUserAsync(int id)
+        public async Task UnassignDeviceFromUserAsync(int id, CancellationToken token)
         {
             // Validate ID
             if (id <= 0)
                 throw new ArgumentException("User-Device association ID must be greater than 0", nameof(id));
 
-            var userDevice = await _userDeviceRepository.GetByIdAsync(id);
+            var userDevice = await _userDeviceRepository.GetByIdAsync(id, token);
 
             // Check if association exists
             if (userDevice == null)
                 throw new Exception($"User-Device association with ID {id} not found");
 
-            await _userDeviceRepository.DeleteAsync(userDevice.Id);
+            await _userDeviceRepository.DeleteAsync(userDevice.Id, token);
         }
     }
 }

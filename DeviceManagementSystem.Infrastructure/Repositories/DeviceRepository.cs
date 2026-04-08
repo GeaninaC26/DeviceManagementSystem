@@ -13,9 +13,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             _databaseProvider = databaseProvider;
         }
 
-        public async Task<Device> GetByIdAsync(int id)
+        public async Task<Device> GetByIdAsync(int id, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -33,10 +33,11 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return null;
         }
 
-        public async Task<IEnumerable<Device>> GetAllAsync()
+        public async Task<IEnumerable<Device>> GetAllAsync(string searchQuery = null, CancellationToken token = default)
         {
             var devices = new List<Device>();
-            using (var connection = _databaseProvider.GetConnection())
+
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -49,13 +50,20 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                         devices.Add(MapReaderToDevice(reader));
                     }
                 }
+                if (!string.IsNullOrWhiteSpace(searchQuery))
+                {
+                    devices = FilterAndScoreDevices(devices, searchQuery);
+                }
             }
+
             return devices;
         }
 
-        public async Task UpsertAsync(Device entity)
+
+
+        public async Task UpsertAsync(Device entity, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -93,9 +101,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             }
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -106,10 +114,10 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             }
         }
 
-        public async Task<List<Device>> GetUnassignedDevicesAsync()
+        public async Task<List<Device>> GetUnassignedDevicesAsync(string searchQuery, CancellationToken token)
         {
             var devices = new List<Device>();
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -126,14 +134,19 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                         devices.Add(MapReaderToDevice(reader));
                     }
                 }
+
+                if (!string.IsNullOrWhiteSpace(searchQuery))
+                {
+                    devices = FilterAndScoreDevices(devices, searchQuery);
+                }   
             }
             return devices;
         }
 
-        public async Task<List<Device>> GetDevicesForUserAsync(int userId)
+        public async Task<List<Device>> GetDevicesForUserAsync(int userId, string? searchQuery, CancellationToken token)
         {
             var devices = new List<Device>();
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -150,6 +163,11 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                     {
                         devices.Add(MapReaderToDevice(reader));
                     }
+                }
+
+                if (!string.IsNullOrWhiteSpace(searchQuery))
+                {
+                    devices = FilterAndScoreDevices(devices, searchQuery);
                 }
             }
             return devices;
@@ -170,6 +188,40 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return new Device(id, name, manufacturer, deviceType, os, osVersion, processor, ram, description);
         }
 
+                private int CalculateScore(Device device, string[] tokens)
+        {
+            int score = 0;
+            foreach (var token in tokens)
+            {
+                if (device.Name?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 10;
+                if (device.Manufacturer?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 5;
+                if (device.Processor?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 3;
+                if (device.RAM?.Contains(token, StringComparison.OrdinalIgnoreCase) == true) score += 1;
+            }
+            return score;
+        }
 
+        private List<Device> FilterAndScoreDevices(List<Device> devices, string searchQuery)
+        {
+            var tokens = searchQuery.ToLowerInvariant()
+                                    .Split(new[] { ' ', ',', '.', '-' }, StringSplitOptions.RemoveEmptyEntries);
+
+            return devices
+                .Select(device => new
+                {
+                    Device = device,
+                    Score = CalculateScore(device, tokens)
+                })
+                .Where(x => x.Score > 0)
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.Device.Name)
+                .Select(x => x.Device)
+                .ToList();
+        }
+
+        public Task<IEnumerable<Device>> GetAllAsync(CancellationToken token)
+        {
+            return GetAllAsync(null, token);
+        }
     }
 }

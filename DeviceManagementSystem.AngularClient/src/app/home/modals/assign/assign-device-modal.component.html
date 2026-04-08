@@ -9,82 +9,111 @@
           <button *ngIf="showCloseButton()" type="button" class="close-button" style="border: none; background: transparent; font-size: 1.5rem; cursor: pointer;" (click)="close()">&times;</button>
         </div>
 
-        <div class="modal-body" style="padding: 1rem;">
-          <div *ngIf="isLoading()" class="loading-state">
-            <p>{{ isAdminMode() ? 'Loading users...' : 'Loading unassigned devices...' }}</p>
-          </div>
+        <div class="modal-body" style="padding: 1rem; display: flex; flex-direction: column; gap: 1rem; overflow: hidden;">
 
-          <div *ngIf="error()" class="error-state" style="margin-bottom: 0.75rem;">
+          <div *ngIf="error()" class="error-state">
             <p class="text-danger" style="margin: 0;">{{ error() }}</p>
           </div>
 
-          <div *ngIf="!isLoading() && !error() && isAdminMode()" class="users-section">
-            <h4 style="margin-bottom: 0.75rem;">Select a User</h4>
-            <table class="table table-hover table-bordered" style="margin-bottom: 0.75rem;">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Location</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  *ngFor="let user of users()"
-                  [style.backgroundColor]="selectedUserId() === user.id ? 'rgba(59, 130, 246, 0.15)' : ''"
-                  [style.fontWeight]="selectedUserId() === user.id ? '600' : '400'"
-                  (click)="selectUser(user.id)"
-                  style="cursor: pointer;"
-                >
-                  <td>{{ user.name }}</td>
-                  <td>{{ user.location }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div *ngIf="!error() && isAdminMode()" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <h4 style="margin: 0;">Select a User</h4>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Search users by name, location, or email..."
+              [value]="userSearchQuery()"
+              (input)="userSearchQuery.set($any($event.target).value); onUserSearchChange()"
+              style="width: 100%;"
+            />
 
-            <div *ngIf="users().length === 0" class="no-users">
-              <p class="text-secondary" style="margin: 0;">No users available</p>
+            <div style="position: relative; flex: 0 1 300px; border: 1px solid #e9ecef; border-radius: 0.25rem; min-height: 200px; overflow: hidden;">
+              <div *ngIf="isLoading()" style="position: absolute; inset: 0; background: rgba(255,255,255,0.6); z-index: 20; display: flex; align-items: center; justify-content: center;">
+                <p style="font-weight: bold;">Loading...</p>
+              </div>
+
+              <div style="overflow-y: auto; height: 100%;">
+                <table class="table table-hover table-bordered" style="margin-bottom: 0;">
+                  <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
+                    <tr>
+                      <th>Name</th>
+                      <th>Location</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let user of users(); trackBy: trackByUserId"
+                      [style.backgroundColor]="selectedUserId() === user.id ? 'rgba(59, 130, 246, 0.15)' : ''"
+                      [style.fontWeight]="selectedUserId() === user.id ? '600' : '400'"
+                      (click)="selectUser(user.id)"
+                      style="cursor: pointer;"
+                    >
+                      <td>{{ user.name }}</td>
+                      <td>{{ user.location }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div *ngIf="users().length === 0 && !isLoading()" style="padding: 1rem; text-align: center;">
+                  <p class="text-secondary" style="margin: 0;">No users available</p>
+                </div>
+              </div>
             </div>
 
             <p *ngIf="selectedUser()" class="text-secondary" style="margin: 0;">
-              Selected user: {{ selectedUser()?.name }}
+              Selected user: <strong>{{ selectedUser()?.name }}</strong>
             </p>
           </div>
 
-          <div *ngIf="!isLoading() && !error() && !isAdminMode()" class="devices-section">
-            <h4 style="margin-bottom: 0.75rem;">Select an Unassigned Device</h4>
-            <table class="table table-hover table-bordered" style="margin-bottom: 0.75rem;">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Manufacturer</th>
-                  <th>Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  *ngFor="let device of devices()"
-                  [style.backgroundColor]="selectedDeviceId() === device.id ? 'rgba(59, 130, 246, 0.15)' : ''"
-                  [style.fontWeight]="selectedDeviceId() === device.id ? '600' : '400'"
-                  (click)="selectDevice(device.id)"
-                  style="cursor: pointer;"
-                >
-                  <td>{{ device.name }}</td>
-                  <td>{{ device.manufacturer }}</td>
-                  <td>{{ device.type }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div *ngIf="!error() && !isAdminMode()" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <h4 style="margin: 0;">Select an Unassigned Device</h4>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Search devices by name, manufacturer, or type..."
+              [value]="deviceSearchQuery()"
+              (input)="deviceSearchQuery.set($any($event.target).value); onDeviceSearchChange()"
+              style="width: 100%;"
+            />
 
-            <div *ngIf="devices().length === 0" class="no-devices">
-              <p class="text-secondary" style="margin: 0;">No unassigned devices available.</p>
+            <div style="position: relative; flex: 0 1 300px; border: 1px solid #e9ecef; border-radius: 0.25rem; min-height: 200px; overflow: hidden;">
+              <div *ngIf="isLoading()" style="position: absolute; inset: 0; background: rgba(255,255,255,0.6); z-index: 20; display: flex; align-items: center; justify-content: center;">
+                <p style="font-weight: bold;">Loading...</p>
+              </div>
+
+              <div style="overflow-y: auto; height: 100%;">
+                <table class="table table-hover table-bordered" style="margin-bottom: 0;">
+                  <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
+                    <tr>
+                      <th>Name</th>
+                      <th>Manufacturer</th>
+                      <th>Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let device of devices(); trackBy: trackByDeviceId"
+                      [style.backgroundColor]="selectedDeviceId() === device.id ? 'rgba(59, 130, 246, 0.15)' : ''"
+                      [style.fontWeight]="selectedDeviceId() === device.id ? '600' : '400'"
+                      (click)="selectDevice(device.id)"
+                      style="cursor: pointer;"
+                    >
+                      <td>{{ device.name }}</td>
+                      <td>{{ device.manufacturer }}</td>
+                      <td>{{ device.type }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div *ngIf="devices().length === 0 && !isLoading()" style="padding: 1rem; text-align: center;">
+                  <p class="text-secondary" style="margin: 0;">No unassigned devices available.</p>
+                </div>
+              </div>
             </div>
 
             <p *ngIf="selectedDevice()" class="text-secondary" style="margin: 0;">
-              Selected device: {{ selectedDevice()?.name }}
+              Selected device: <strong>{{ selectedDevice()?.name }}</strong>
             </p>
           </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1rem; border-top: 1px solid #e9ecef;">
             <button class="btn btn-secondary" (click)="cancelAssign()" [disabled]="isLoading()">Cancel</button>
             <button class="btn btn-primary" (click)="confirmAssign()" [disabled]="(isAdminMode() ? !selectedUserId() : !selectedDeviceId()) || isLoading()">Confirm</button>
           </div>

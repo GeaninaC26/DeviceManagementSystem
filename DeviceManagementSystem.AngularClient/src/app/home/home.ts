@@ -32,7 +32,7 @@ export class Home implements OnInit {
     // Find the user details
     return this.users().find(u => u.id === userDevice.userId) || null;
   });
-  readonly deviceSearchText = signal('');
+  readonly deviceSearchText = signal<string | null>(null);
   readonly isLoading = signal(false);
   readonly error = signal<string | null>(null);
   readonly currentPage = signal(1);
@@ -68,13 +68,16 @@ export class Home implements OnInit {
         this.isLoading.set(true);
         this.error.set(null);
         this.users.set(await this.userService.getUsers());
-        this.devices.set(await this.deviceService.getDevices());
+        console.log('Fetched users:', this.users());
+        this.devices.set(await this.deviceService.getDevices(this.deviceSearchText()?.toString()));
+        console.log('Fetched devices:', this.devices());
         this.userDevices.set(await this.userDeviceService.getUserDevices());
+        console.log('Fetched user-device mappings:', this.userDevices());
       }else{
         this.isLoading.set(true);
         this.error.set(null);
         const userId = currentUser.id;
-        this.devices.set(await this.deviceService.getDevicesForUser(userId));
+        this.devices.set(await this.deviceService.getDevicesForUser(userId, this.deviceSearchText()?.toString()));
         const userDevices = await this.userDeviceService.getUserDevices();
         this.userDevices.set(userDevices.filter((ud: any) => ud.userId === userId));
 
@@ -92,6 +95,7 @@ export class Home implements OnInit {
 
   onDeviceSearchTextChange(text: string) {
     this.deviceSearchText.set(text);
+    this.loadData();
   }
 
   selectDevice(device: DeviceDto) : void {

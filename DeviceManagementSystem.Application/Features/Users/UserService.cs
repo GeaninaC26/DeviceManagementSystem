@@ -18,7 +18,7 @@ namespace DeviceManagementSystem.Application.Features.Users
             _userRepository = userRepository;
         }
 
-        public async Task<UserDto> AuthenticateAsync(string email, string password)
+        public async Task<UserDto> AuthenticateAsync(string email, string password, CancellationToken token)
         {
             // Validate input
             if (string.IsNullOrWhiteSpace(email))
@@ -27,7 +27,7 @@ namespace DeviceManagementSystem.Application.Features.Users
             if (string.IsNullOrWhiteSpace(password))
                 throw new ArgumentException("Password is required", nameof(password));
 
-            var user = await _userRepository.GetByEmailAsync(email);
+            var user = await _userRepository.GetByEmailAsync(email, token);
             
             if (user == null)
                 throw new KeyNotFoundException($"User with email {email} not found");
@@ -35,7 +35,7 @@ namespace DeviceManagementSystem.Application.Features.Users
             if (!VerifyPassword(password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid password");
 
-            return await _userMapper.PrepareItemAsync(user, CancellationToken.None);
+            return await _userMapper.PrepareItemAsync(user, token);
         }
 
         private bool VerifyPassword(string password, string passwordHash)
@@ -67,28 +67,28 @@ namespace DeviceManagementSystem.Application.Features.Users
             return encoder.Encode(password);
         }
 
-        public async Task<UserDto> GetUserByIdAsync(int id)
+        public async Task<UserDto> GetUserByIdAsync(int id, CancellationToken token)
         {
             // Validate ID
             if (id <= 0)
                 throw new ArgumentException("User ID must be greater than 0", nameof(id));
 
-            var user = await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id, token);
             
             // Check if user exists
             if (user == null)
                 throw new KeyNotFoundException($"User with ID {id} not found");
             
-            return await _userMapper.PrepareItemAsync(user, CancellationToken.None);
+            return await _userMapper.PrepareItemAsync(user, token);
         }
 
-        public async Task<List<UserDto>> GetAllUsersAsync()
+        public async Task<List<UserDto>> GetAllUsersAsync(string? searchQuery, CancellationToken token)
         {
-            var users = await _userRepository.GetAllAsync();
-            return (await _userMapper.PrepareItemsAsync(users, CancellationToken.None)).ToList();
+            var users = await _userRepository.GetAllAsync(searchQuery, token);
+            return (await _userMapper.PrepareItemsAsync(users, token)).ToList();
         }
 
-        public async Task UpsertUserAsync(UpsertUserCommand userCommand)
+        public async Task UpsertUserAsync(UpsertUserCommand userCommand, CancellationToken token)
         {
             // Validate command
             if (userCommand == null)
@@ -110,7 +110,7 @@ namespace DeviceManagementSystem.Application.Features.Users
             if (string.IsNullOrWhiteSpace(userCommand.Password))
                 throw new ArgumentException("User password is required", nameof(userCommand.Password));
             
-            var existingUser = await _userRepository.GetByEmailAsync(userCommand.Email);
+            var existingUser = await _userRepository.GetByEmailAsync(userCommand.Email, token);
             if (existingUser != null && existingUser.Id != userCommand.Id)
                 throw new InvalidOperationException($"Account with email {userCommand.Email} already exists");
 
@@ -131,22 +131,22 @@ namespace DeviceManagementSystem.Application.Features.Users
             {
                 user = new User(userCommand.Name, role, userCommand.Location, userCommand.Email, passwordHash);
             }
-            await _userRepository.UpsertAsync(user);
+            await _userRepository.UpsertAsync(user, token);
         }
 
-        public async Task DeleteUserAsync(int id)
+        public async Task DeleteUserAsync(int id, CancellationToken token)
         {
             // Validate ID
             if (id <= 0)
                 throw new ArgumentException("User ID must be greater than 0", nameof(id));
 
-            var user = await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id, token);
             
             // Check if user exists
             if (user == null)
                 throw new KeyNotFoundException($"User with ID {id} not found");
             
-            await _userRepository.DeleteAsync(user.Id);
+            await _userRepository.DeleteAsync(user.Id, token);
         }
 
     }

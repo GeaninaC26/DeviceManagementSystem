@@ -30,16 +30,16 @@ namespace DeviceManagementSystem.Controllers
             return Ok(userDevice);
         }
         [HttpPost]
-        public async Task<IActionResult> AssignDeviceToUser([FromBody] AssignDeviceToUserCommand command)
+        public async Task<IActionResult> AssignDeviceToUser([FromBody] AssignDeviceToUserCommand command, CancellationToken token)
         {
-            await _userDeviceService.AssignDeviceToUserAsync(command.UserId, command.DeviceId);
+            await _userDeviceService.AssignDeviceToUserAsync(command.UserId, command.DeviceId, token);
             return Ok();
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> UnassignDeviceFromUser(int id)
+        public async Task<IActionResult> UnassignDeviceFromUser(int id, CancellationToken token)
         {
             Console.WriteLine($"Received request to unassign user-device association with ID: {id}");
-            await _userDeviceService.UnassignDeviceFromUserAsync(id);
+            await _userDeviceService.UnassignDeviceFromUserAsync(id, token);
             return Ok();
         }
 

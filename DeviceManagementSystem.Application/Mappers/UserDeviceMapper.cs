@@ -19,8 +19,8 @@ namespace DeviceManagementSystem.Application.Mappers
         {
             if (entity == null) return null;
 
-            var user = await _userRepository.GetByIdAsync(entity.UserId);
-            var device = await _deviceRepository.GetByIdAsync(entity.DeviceId);
+            var user = await _userRepository.GetByIdAsync(entity.UserId, token);
+            var device = await _deviceRepository.GetByIdAsync(entity.DeviceId, token);
 
             var userDeviceDto = new UserDeviceDto
             {

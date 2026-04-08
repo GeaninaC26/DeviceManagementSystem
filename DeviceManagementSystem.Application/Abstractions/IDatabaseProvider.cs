@@ -4,6 +4,6 @@ namespace DeviceManagementSystem.Application.Abstractions
 {
     public interface IDatabaseProvider
     {
-        SqlConnection GetConnection();
+        SqlConnection GetConnection(CancellationToken token);
     }
 }

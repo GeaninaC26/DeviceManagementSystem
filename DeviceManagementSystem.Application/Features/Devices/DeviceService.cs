@@ -26,7 +26,7 @@ namespace DeviceManagementSystem.Application.Features.Devices
             if (id <= 0)
                 throw new ArgumentException("Device ID must be greater than 0", nameof(id));
 
-            var device = await _deviceRepository.GetByIdAsync(id);
+            var device = await _deviceRepository.GetByIdAsync(id, token);
 
             // Check if device exists
             if (device == null)
@@ -35,19 +35,19 @@ namespace DeviceManagementSystem.Application.Features.Devices
             return await _deviceMapper.PrepareItemAsync(device, token);
         }
 
-        public async Task<List<DeviceDto>> GetAllDevicesAsync(CancellationToken token)
+        public async Task<List<DeviceDto>> GetAllDevicesAsync(string searchQuery, CancellationToken token)
         {
-            var devices = await _deviceRepository.GetAllAsync();
+            var devices = await _deviceRepository.GetAllAsync(searchQuery, token);
             return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
-        public async Task<List<DeviceDto>> GetUnassignedDevicesAsync(CancellationToken token)
+        public async Task<List<DeviceDto>> GetUnassignedDevicesAsync(string searchQuery, CancellationToken token)
         {
-            var devices = await _deviceRepository.GetUnassignedDevicesAsync();
+            var devices = await _deviceRepository.GetUnassignedDevicesAsync(searchQuery, token);
             return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
-        public async Task UpsertDeviceAsync(UpsertDeviceCommand command)
+        public async Task UpsertDeviceAsync(UpsertDeviceCommand command, CancellationToken token)
         {
             // Validate command
             if (command == null)
@@ -105,34 +105,34 @@ namespace DeviceManagementSystem.Application.Features.Devices
                     command.Description ?? string.Empty
                 );
             }
-            await _deviceRepository.UpsertAsync(device);
+            await _deviceRepository.UpsertAsync(device, token);
         }
 
-        public async Task<List<DeviceDto>> GetDevicesForUserAsync(int userId, CancellationToken token)
+        public async Task<List<DeviceDto>> GetDevicesForUserAsync(int userId, string? searchQuery, CancellationToken token)
         {
             if (userId <= 0)
                 throw new ArgumentException("User ID must be greater than 0", nameof(userId));
 
-            var devices = await _deviceRepository.GetDevicesForUserAsync(userId);
+            var devices = await _deviceRepository.GetDevicesForUserAsync(userId, searchQuery, token);
             return (await _deviceMapper.PrepareItemsAsync(devices, token)).ToList();
         }
 
-        public async Task DeleteDeviceAsync(int id)
+        public async Task DeleteDeviceAsync(int id, CancellationToken token)
         {
             // Validate ID
             if (id <= 0)
                 throw new ArgumentException("Device ID must be greater than 0", nameof(id));
 
-            var device = await _deviceRepository.GetByIdAsync(id);
+            var device = await _deviceRepository.GetByIdAsync(id, token);
 
             // Check if device exists
             if (device == null)
                 throw new Exception($"Device with ID {id} not found");
 
-            await _deviceRepository.DeleteAsync(device.Id);
+            await _deviceRepository.DeleteAsync(device.Id, token);
         }
 
-        public async Task<string> GenerateDeviceDescriptionAsync(GenerateDeviceDescriptionCommand command)
+        public async Task<string> GenerateDeviceDescriptionAsync(GenerateDeviceDescriptionCommand command, CancellationToken token)
         {
             var client = new Client(apiKey: _configuration["GEMINI_API_KEY"]);
 

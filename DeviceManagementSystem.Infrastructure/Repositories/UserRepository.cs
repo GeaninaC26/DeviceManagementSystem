@@ -16,9 +16,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             _databaseProvider = databaseProvider;
         }
 
-        public async Task<User> GetByIdAsync(int id)
+        public async Task<User> GetByIdAsync(int id, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -34,9 +34,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return null;
         }
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<User> GetByEmailAsync(string email, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -52,29 +52,35 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             return null;
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public async Task<IEnumerable<User>> GetAllAsync(string searchQuery, CancellationToken token)
         {
             var users = new List<User>();
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
                 command.CommandText = "SELECT Id, Name, Role, Location, Email, PasswordHash FROM Users";
 
-                using (var reader = await command.ExecuteReaderAsync())
+                using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
                 {
-                    while (await reader.ReadAsync())
-                    {
-                        users.Add(MapReaderToUser(reader));
-                    }
+                    users.Add(MapReaderToUser(reader));
                 }
+            }
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                users = users.Where(u =>
+                    u.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    u.Email.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    u.Location.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
             }
             return users;
         }
 
-        public async Task UpsertAsync(User entity)
+        public async Task UpsertAsync(User entity, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -100,9 +106,9 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
                 await command.ExecuteNonQueryAsync();
             }
         }
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, CancellationToken token)
         {
-            using (var connection = _databaseProvider.GetConnection())
+            using (var connection = _databaseProvider.GetConnection(token))
             {
                 await connection.OpenAsync();
                 var command = connection.CreateCommand();
@@ -129,6 +135,11 @@ namespace DeviceManagementSystem.Infrastructure.Repositories
             }
 
             return new User(id, name, role, location, email, passwordHash);
+        }
+
+        public Task<IEnumerable<User>> GetAllAsync(CancellationToken token)
+        {
+            return GetAllAsync(null, token);
         }
     }
 }
