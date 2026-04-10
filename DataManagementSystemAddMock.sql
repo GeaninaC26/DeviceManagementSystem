@@ -2,21 +2,27 @@ USE DeviceManagementDB;
 GO
 
 WITH NewUsers (Name, Email, Role, Location) AS (
-    SELECT 'Meredith Grey', 'm.grey@grey-sloan.com', 'Admin', 'Seattle' UNION ALL
-    SELECT 'Derek Shepherd', 'd.shepherd@grey-sloan.com', 'User', 'Seattle' UNION ALL
-    SELECT 'Cristina Yang', 'c.yang@grey-sloan.com', 'User', 'Switzerland' UNION ALL
-    SELECT 'Alex Karev', 'a.karev@grey-sloan.com', 'User', 'Kansas' UNION ALL
-    SELECT 'Miranda Bailey', 'm.bailey@grey-sloan.com', 'Admin', 'Seattle' UNION ALL
-    SELECT 'Richard Webber', 'r.webber@grey-sloan.com', 'Admin', 'Seattle' UNION ALL
-    SELECT 'Callie Torres', 'c.torres@grey-sloan.com', 'User', 'New York' UNION ALL
-    SELECT 'Arizona Robbins', 'a.robbins@grey-sloan.com', 'User', 'New York' UNION ALL
-    SELECT 'Jackson Avery', 'j.avery@grey-sloan.com', 'User', 'Boston' UNION ALL
-    SELECT 'April Kepner', 'a.kepner@grey-sloan.com', 'User', 'Seattle'
+    SELECT 'Meredith Grey', 'm.grey@email.com', 'User', 'Seattle' UNION ALL
+    SELECT 'Derek Shepherd', 'd.shepherd@email.com', 'User', 'Seattle' UNION ALL
+    SELECT 'Cristina Yang', 'c.yang@email.com', 'User', 'Switzerland' UNION ALL
+    SELECT 'Alex Karev', 'a.karev@email.com', 'User', 'Kansas' UNION ALL
+    SELECT 'Miranda Bailey', 'm.bailey@email.com', 'User', 'Seattle' UNION ALL
+    SELECT 'Richard Webber', 'r.webber@email.com', 'User', 'Seattle' UNION ALL
+    SELECT 'Callie Torres', 'c.torres@email.com', 'User', 'New York' UNION ALL
+    SELECT 'Arizona Robbins', 'a.robbins@email.com', 'User', 'New York' UNION ALL
+    SELECT 'Jackson Avery', 'j.avery@email.com', 'User', 'Boston' UNION ALL
+    SELECT 'April Kepner', 'a.kepner@email.com', 'User', 'Seattle'
 )
 INSERT INTO Users (Name, Email, Role, Location, PasswordHash)
-SELECT nu.Name, nu.Email, nu.Role, nu.Location, 'hashed_default_password'
+SELECT nu.Name, nu.Email, nu.Role, nu.Location, 'defaultpasswordhash'
 FROM NewUsers nu
 WHERE NOT EXISTS (SELECT 1 FROM Users WHERE Users.Email = nu.Email);
+
+INSERT INTO Users (Name, Email, Role, Location, PasswordHash)
+SELECT 'Admin User', 'admin@email.com', 'Admin', 'Seattle', 'admin'
+WHERE NOT EXISTS (
+    SELECT 1 FROM Users WHERE Email = 'admin@email.com'
+);
 
 WITH NewDevices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description, SerialNumber) AS (
     SELECT 'MacBook Air M3', 'Apple', 'Laptop', 'macOS', 'Sonoma', 'M3', '16GB', 'Ultra-thin laptop', 'MB-AIR-M3-001' UNION ALL
@@ -38,24 +44,21 @@ WITH NewDevices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Descri
 INSERT INTO Devices (Name, Manufacturer, Type, OS, OSVersion, Processor, RAM, Description, SerialNumber)
 SELECT nd.Name, nd.Manufacturer, nd.Type, nd.OS, nd.OSVersion, nd.Processor, nd.RAM, nd.Description, nd.SerialNumber
 FROM NewDevices nd
-WHERE NOT EXISTS (SELECT 1 FROM Devices WHERE Devices.Name = nd.Name);
+WHERE NOT EXISTS (SELECT 1 FROM Devices WHERE Devices.SerialNumber = nd.SerialNumber);
 
-/* --- 3. MOCK ASSIGNMENTS (UserDevices) --- */
--- Meredith gets her MacBook
+
 INSERT INTO UserDevices (UserId, DeviceId)
 SELECT u.Id, d.Id FROM Users u, Devices d 
-WHERE u.Email = 'm.grey@grey-sloan.com' AND d.Name = 'MacBook Air M3'
+WHERE u.Email = 'm.grey@email.com' AND d.Name = 'MacBook Air M3'
 AND NOT EXISTS (SELECT 1 FROM UserDevices ud WHERE ud.UserId = u.Id AND ud.DeviceId = d.Id);
 
--- Cristina gets her high-end ThinkPad
 INSERT INTO UserDevices (UserId, DeviceId)
 SELECT u.Id, d.Id FROM Users u, Devices d 
-WHERE u.Email = 'c.yang@grey-sloan.com' AND d.Name = 'ThinkPad X1 Carbon'
+WHERE u.Email = 'c.yang@email.com' AND d.Name = 'ThinkPad X1 Carbon'
 AND NOT EXISTS (SELECT 1 FROM UserDevices ud WHERE ud.UserId = u.Id AND ud.DeviceId = d.Id);
 
--- Derek gets an iPhone
 INSERT INTO UserDevices (UserId, DeviceId)
 SELECT u.Id, d.Id FROM Users u, Devices d 
-WHERE u.Email = 'd.shepherd@grey-sloan.com' AND d.Name = 'iPhone 15 Pro'
+WHERE u.Email = 'd.shepherd@email.com' AND d.Name = 'iPhone 15 Pro'
 AND NOT EXISTS (SELECT 1 FROM UserDevices ud WHERE ud.UserId = u.Id AND ud.DeviceId = d.Id);
 GO
