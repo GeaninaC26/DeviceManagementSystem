@@ -1,0 +1,12 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/DeviceManagementSystem/" />
+  <Project Path="DeviceManagementSystem.Application/DeviceManagementSystem.Application.csproj" />
+  <Project Path="DeviceManagementSystem.Domain/DeviceManagementSystem.Domain.csproj" />
+  <Project Path="DeviceManagementSystem.Infrastructure/DeviceManagementSystem.Infrastructure.csproj" />
+  <Project Path="DeviceManagementSystem/DeviceManagementSystem.csproj" />
+</Solution>

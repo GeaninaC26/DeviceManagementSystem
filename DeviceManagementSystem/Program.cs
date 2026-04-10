@@ -79,13 +79,10 @@ var app = builder.Build();
 
 app.UseGlobalExceptionHandler();
 
-
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseHttpsRedirection();
-
 if (builder.Environment.IsDevelopment())
 {
     app.UseSwagger();
