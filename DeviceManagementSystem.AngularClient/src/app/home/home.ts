@@ -48,6 +48,14 @@ export class Home implements OnInit {
   readonly totalPages = computed(() => {
     return Math.ceil(this.devices().length / this.itemsPerPage);
   });
+
+  readonly safeTotalPages = computed(() => {
+    return Math.max(this.totalPages(), 1);
+  });
+
+  readonly hasDevices = computed(() => this.devices().length > 0);
+
+  readonly hasVisibleDevices = computed(() => this.paginatedDevices().length > 0);
   constructor(
     private authService: AuthService,
     private userService: UserService,
@@ -81,6 +89,18 @@ export class Home implements OnInit {
         const userDevices = await this.userDeviceService.getUserDevices();
         this.userDevices.set(userDevices.filter((ud: any) => ud.userId === userId));
       }
+
+      const selected = this.selectedDevice();
+      if (selected && !this.devices().some((d) => d.id === selected.id)) {
+        this.selectedDevice.set(null);
+      }
+
+      const totalPages = this.totalPages();
+      if (totalPages === 0) {
+        this.currentPage.set(1);
+      } else if (this.currentPage() > totalPages) {
+        this.currentPage.set(totalPages);
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
       this.error.set(extractApiErrorMessage(error, 'Failed to fetch users.'));
@@ -91,6 +111,7 @@ export class Home implements OnInit {
 
   onDeviceSearchTextChange(text: string) {
     this.deviceSearchText.set(text);
+    this.currentPage.set(1);
     this.loadData();
   }
 

@@ -31,10 +31,13 @@
           <span class="device-badge"> | </span>
           <span class="device-badge"> Processor: {{ device.processor }} </span>
         </div>
+        <div *ngIf="!isLoading() && !error() && !hasVisibleDevices()" class="device-list-empty">
+          {{ deviceSearchText()?.trim() ? 'No devices match your search.' : 'No devices available.' }}
+        </div>
       </div>
 
       <!-- Pagination Controls -->
-      <div class="pagination-controls">
+      <div class="pagination-controls" *ngIf="!isLoading() && !error() && hasDevices() && safeTotalPages() > 1">
         <button
           class="btn btn-sm btn-secondary"
           (click)="previousPage()"
@@ -42,11 +45,11 @@
         >
           Previous
         </button>
-        <div class="pagination-info">Page {{ currentPage() }} of {{ totalPages() }}</div>
+        <div class="pagination-info">Page {{ currentPage() }} of {{ safeTotalPages() }}</div>
         <button
           class="btn btn-sm btn-secondary"
           (click)="nextPage()"
-          [disabled]="currentPage() === totalPages()"
+          [disabled]="currentPage() === safeTotalPages()"
         >
           Next
         </button>

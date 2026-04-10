@@ -75,6 +75,15 @@ app-device-management {
   overflow-y: auto;
 }
 
+.device-list-empty {
+  text-align: center;
+  color: var(--text-secondary, #6b7280);
+  padding: 1rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-white);
+}
+
 .pagination-controls {
   display: flex;
   justify-content: center;
