@@ -91,8 +91,9 @@ export class Home implements OnInit {
       }
 
       const selected = this.selectedDevice();
-      if (selected && !this.devices().some((d) => d.id === selected.id)) {
-        this.selectedDevice.set(null);
+      if (selected) {
+        const refreshedSelected = this.devices().find((d) => d.id === selected.id) ?? null;
+        this.selectedDevice.set(refreshedSelected);
       }
 
       const totalPages = this.totalPages();

@@ -86,7 +86,6 @@ namespace DeviceManagementSystem.Application.Features.Devices
             {
                 device = new Device(
                     command.Id,
-                    command.SerialNumber,
                     command.Name,
                     command.Manufacturer,
                     command.Type,
@@ -94,7 +93,8 @@ namespace DeviceManagementSystem.Application.Features.Devices
                     command.OSVersion,
                     command.Processor,
                     command.RAM,
-                    command.Description ?? string.Empty
+                    command.Description ?? string.Empty,
+                    command.SerialNumber
                 );
             }
             else
@@ -107,7 +107,6 @@ namespace DeviceManagementSystem.Application.Features.Devices
                 }
 
                 device = new Device(
-                    command.SerialNumber,
                     command.Name,
                     command.Manufacturer,
                     command.Type,
@@ -115,7 +114,8 @@ namespace DeviceManagementSystem.Application.Features.Devices
                     command.OSVersion,
                     command.Processor,
                     command.RAM,
-                    command.Description ?? string.Empty
+                    command.Description ?? string.Empty,
+                    command.SerialNumber
                 );
             }
             await _deviceRepository.UpsertAsync(device, token);
